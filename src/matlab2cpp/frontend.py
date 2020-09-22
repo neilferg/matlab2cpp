@@ -216,24 +216,24 @@ Args:
             f.close()
 
         if hpp:
-            hpp = """// Automatically translated using m2cpp %s on %s
+            hpp = """// Automatically translated using m2cpp
 
-%s""" % (__version__, stamp, hpp)
+%s""" % (hpp)
             f = open(name+".hpp", "w")
             f.write(hpp)
             f.close()
 
         if log:
-            log = "Automatically translated using m2cpp %s on %s\n\n%s"\
-                    % (__version__, stamp, log)
+            log = "Automatically translated using m2cpp\n\n%s"\
+                    % (log)
             f = open(name+".log", "w")
             f.write(log)
             f.close()
 
         if py:
-            py = """# Automatically translated using m2cpp %s on %s
+            py = """# Automatically translated using m2cpp
 #
-%s""" % (__version__, stamp, py)
+%s""" % (py)
             f = open(name+".py", "w")
             f.write(py)
             f.close()
