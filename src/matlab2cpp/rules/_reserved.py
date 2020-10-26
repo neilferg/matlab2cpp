@@ -29,7 +29,7 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
-    "global", "cat",
+    "global", "cat", "strcmp",
 }
 
 # Common attribute
@@ -1480,6 +1480,9 @@ def Get_cat(node):
         return "join_slices(%(1)s, %(2)s)"
     else:
         return node.code
+
+def Get_strcmp(node):  
+    return "%(0)s == %(1)s"
 
 if __name__ == "__main__":
     import doctest
