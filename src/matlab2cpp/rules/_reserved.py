@@ -29,7 +29,7 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
-    "global"
+    "global", "cat",
 }
 
 # Common attribute
@@ -1470,6 +1470,16 @@ def Get_find(node):
 
 def Get_global(node):
     return "// global %(0)s"
+
+def Get_cat(node):
+    if node[0].value == '1':
+        return "join_rows(%(1)s, %(2)s)"
+    elif node[0].value == '2':
+        return "join_cols(%(1)s, %(2)s)"
+    elif node[0].value == '3':
+        return "join_slices(%(1)s, %(2)s)"
+    else:
+        return node.code
 
 if __name__ == "__main__":
     import doctest
