@@ -383,7 +383,8 @@ def Get_size(node):
 
 def Assign_size(node):
     num = node[-1][0].dim == 3 and "2" or "2"
-    if len(node[-1]) == 2 and (node[-1][1].str == "1" or node[-1][1].str == "2"):
+    if len(node[-1]) == 2 and \
+       (node[-1][1].str == "1" or node[-1][1].str == "2" or node[-1][1].str == "3"):
         return "%(0)s = %(1)s ;"
     else:
         return "uword _%(0)s [] = %(1)s ;\n"+\
