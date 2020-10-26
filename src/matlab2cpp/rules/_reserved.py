@@ -240,7 +240,8 @@ def Var_i(node):
 def Get_mod(node):
     node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
-        return "", " __percent__ ", ""
+        # plenty of parentheses needed here to be safe
+        return "((", ") __percent__ (", "))"
     return "mod(", ", ", ")"
 
 def Get_abs(node):
