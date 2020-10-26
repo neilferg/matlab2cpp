@@ -160,6 +160,17 @@ Example::
                     #m = m+1
                     code = code[:m+1] + " " + code[m+1:]
                 l = m
+                
+        # Rather crude way to preserve blank lines:
+        # substitute them with a comment '% __BLANK_LINE__'
+        code_tmp = code
+        code = []
+        for ln in code_tmp.splitlines():
+            if len(ln.strip()) == 0:
+                code.append('% __BLANK_LINE__')
+            else:
+                code.append(ln)
+        code = '\n'.join(code)
 
         self.code = code + "\n\n\n"
         self.create_program(name)

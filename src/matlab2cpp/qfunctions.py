@@ -182,6 +182,7 @@ See also:
             out += funcs.str + "\n\n"
 
         out = out.replace("__percent__", "%")
+        out = out.replace("// __BLANK_LINE__", "")
 
         out =  out[:-2]
 
@@ -304,6 +305,7 @@ See also:
         out += "\n#endif"
 
     out = out.replace("__percent__", "%")
+    out = out.replace("// __BLANK_LINE__", "")
     from .rules._program import add_indenting, number_fix, strip
     out = strip(out)
     out = number_fix(out)
@@ -587,6 +589,7 @@ Example:
 
 
     out = out.replace("__percent__", "%")
+    out = out.replace("// __BLANK_LINE__", "")
     from .rules._program import add_indenting, number_fix, strip
     out = strip(out)
     out = number_fix(out)
