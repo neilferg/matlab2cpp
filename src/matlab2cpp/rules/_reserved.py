@@ -657,6 +657,8 @@ def Get_eye(node):
     # not numerical input
     if not node[0].num:
         return "eye(", ", ", ")"
+    
+    node.type = node.group[0].type
 
     # single argument constructor
     if len(node) == 1:
