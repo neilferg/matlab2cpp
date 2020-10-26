@@ -664,3 +664,35 @@ def reserved(self, node, start):
 
     if self.code[k:k+5] == "clear":
         pass
+
+    if self.code[k:k+6] == "global":
+
+        statement = collection.Statement(node, cur=start,
+                                         code=self.code[start:newline])
+
+        l = k+6
+        while self.code[l] in " \t":
+            l += 1
+
+        if self.code[l] == "(":
+            return expression.create(self, statement, k)
+
+        k += 6
+        while self.code[k] in " \t\n'":
+            k += 1
+
+        l = k
+        while self.code[l] not in " \t\n":
+            l += 1
+
+        get = collection.Get(statement, name="global", cur=start, value=self.code[k:l])
+
+        name = str(self.code[k:l]).split(".")[0]
+        node = collection.Var(get, name)
+        node.create_declare()
+
+        while self.code[k] not in ";\n":
+            k += 1
+
+
+        return k

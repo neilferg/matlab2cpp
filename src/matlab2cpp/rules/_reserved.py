@@ -29,6 +29,7 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
+    "global"
 }
 
 # Common attribute
@@ -1466,6 +1467,9 @@ def Get_logspace(node):
 
 def Get_find(node):
     return "find(", ", ", ") + 1"
+
+def Get_global(node):
+    return "// global %(0)s"
 
 if __name__ == "__main__":
     import doctest
