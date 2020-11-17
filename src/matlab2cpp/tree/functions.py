@@ -276,7 +276,7 @@ def function(self, parent, cur):
             print(repr(self.code[START:m+1]))
 
         end = start+1
-        while self.code[end] in constants.letters+"_":
+        while self.code[end] in constants.letters+constants.digits+"_":
             end += 1
 
         name = self.code[start:end]
