@@ -29,7 +29,7 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
-    "global", "cat", "strcmp","strcmpi",
+    "global", "cat", "strcmp","strcmpi","class"
 }
 
 # Common attribute

@@ -121,6 +121,11 @@ def remove_close_clear_clc(nodes):
         if n.backend == "reserved" and n.name in ("clear", "close", "clc"):
             index = n.parent.parent.children.index(n.parent)
             del n.parent.parent.children[index]
+            
+        if n.backend == "reserved" and n.name in ("class"):
+            index = n.parent.children.index(n)
+            del n.parent.children[index]
+        
     return nodes
 
 

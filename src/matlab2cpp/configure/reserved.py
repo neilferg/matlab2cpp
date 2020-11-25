@@ -3,6 +3,36 @@ Var_true = "int"
 Var_pi = "double"
 Get_linspace = "rowvec"
 
+strClassType2Mem = {
+    'uint64':  0, # uword
+    'uint32':  0,
+    'uint16':  0,
+    'uint8':   0,
+    'int64':   1, # int
+    'int32':   1,
+    'int16':   1,
+    'int8':    1,
+    'logical': 0, # uword
+    'single':  2, # float
+    'double':  3, # double
+    'complex': 4, # complex
+}
+
+def _extractMemClass(node):
+    # Look for a class(var) or string type literal (e.g 'uint32'). Extract if
+    # present. Return the number of leading nodes that comprise the dimensions
+    mem = None
+    numDims = 0
+    for cn in node:
+        if (cn.backend == 'reserved') and (cn.name == 'class'): # class(var)
+            mem = cn[0].mem
+        elif cn.cls == "String": # 'uint32'
+            mem = strClassType2Mem.get(cn.value, None)
+        else:
+            numDims += 1
+
+    return numDims, mem
+
 def Get_exp(node):
     node.type = node[0].type
 
@@ -351,6 +381,11 @@ def Get_zeros(node):
     node.type = "uword"
     dim, mem = node.suggest_datatype()
     
+    numDims, memFromClass = _extractMemClass(node)
+
+    if dim is None and mem is None:
+        mem = memFromClass
+
     # set memory type
     if not (mem is None):
         node.mem = mem
@@ -370,7 +405,7 @@ def Get_zeros(node):
             return
     
     # one argument
-    if len(node) == 1:
+    if numDims == 1:
         
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
@@ -385,7 +420,7 @@ def Get_zeros(node):
                 node.dim = 3 # default
 
     # double argument creates colvec/rowvec/matrix depending on context
-    elif len(node) == 2:
+    elif numDims == 2:
 
         # use matrix, if suggested
         if dim == 3:
@@ -404,7 +439,7 @@ def Get_zeros(node):
             node.dim = 3
 
     # triple arg create cube
-    elif len(node) == 3:
+    elif numDims == 3:
         node.dim = 4
 
 Get_ones = Get_zeros
