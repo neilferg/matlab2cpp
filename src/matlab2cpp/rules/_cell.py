@@ -18,5 +18,8 @@ def Assign(node):
         # append to cell, one by one
         for elem in node[1]:
             out = out + "\n%(0)s.push_back(" + str(elem) + ") ;"
+        
+        # NF_DEBUG: possible replament for the append code above
+        #out = "%(0)s = " + str(node[1]) + " ;"
 
     return out

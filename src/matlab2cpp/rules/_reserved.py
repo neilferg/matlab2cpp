@@ -93,9 +93,9 @@ def Get_log2(node):
     node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
-        return "std::log(%(0)s)/std::log(2)"
+        #return "std::log(%(0)s)/std::log(2)"
         #seems like it is a C++11 feature
-        #return "std::log2(", ", ", ")"
+        return "std::log2(", ", ", ")"
     return "arma::log2(", ", ", ")"
 
 def Get_log10(node) :
