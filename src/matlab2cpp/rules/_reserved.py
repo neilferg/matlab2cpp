@@ -29,7 +29,7 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
-    "global", "cat", "strcmp",
+    "global", "cat", "strcmp","strcmpi",
 }
 
 # Common attribute
@@ -1485,6 +1485,18 @@ def Get_cat(node):
 
 def Get_strcmp(node):  
     return "%(0)s == %(1)s"
+
+def Get_strcmpi(node):
+    node.include("strings")
+    
+    txt = "(strcasecmp(%(0)s"
+    if isinstance(node.children[0], matlab2cpp.collection.Var):
+        txt += ".c_str()"
+    txt += ", %(1)s"
+    if isinstance(node.children[1], matlab2cpp.collection.Var):
+        txt += ".c_str()"
+    txt += ") == 0)"  
+    return txt
 
 if __name__ == "__main__":
     import doctest

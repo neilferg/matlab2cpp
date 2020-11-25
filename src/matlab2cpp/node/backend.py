@@ -713,6 +713,8 @@ See also:
             include_code = "#include <tbb/tbb.h>"
         elif name == "no_min_max":
             include_code = "#define NOMINMAX"
+        elif name == "strings":
+            include_code = "#include <strings.h>"
         else:
             include_code = ""
 
