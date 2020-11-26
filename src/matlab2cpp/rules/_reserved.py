@@ -31,7 +31,9 @@ reserved = {
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
     "global", "cat", "strcmp","strcmpi","class",
     'uint64', 'uint32', 'uint16', 'uint8', 'int64', 'int32', 'int16', 'int8',
-    'logical', 'single', 'double', 'complex'
+    'logical', 'single', 'double', 'complex',
+    'xor', 'bitand', 'bitxor',
+    'bitshift'
 }
 
 # Common attribute
@@ -1514,6 +1516,42 @@ Get_logical = Get_uint64
 Get_single = Get_uint64
 Get_double = Get_uint64
 Get_complex = Get_uint64
+
+def Get_bitand(node):
+    if (node[0].dim == 0) and (node[1].dim == 0):
+        return "((%(0)s) & (%(1)s))"
+    else: # assume both are matrices
+        return "mat_binand(%(0)s, %(1)s)"
+    
+def Get_xor(node):
+    if (node[0].dim == 0) and (node[1].dim == 0):
+        return "lxor(%(0)s, %(1)s)"
+    else: # assume both are matrices
+        return "mat_lxor(%(0)s, %(1)s)"
+
+def Get_bitxor(node):
+    if (node[0].dim == 0) and (node[1].dim == 0):
+        return "((%(0)s) ^ (%(1)s))"
+    else: # assume both are matrices
+        return "mat_bitxor(%(0)s, %(1)s)"
+
+def Get_bitshift(node):
+    if (node[0].dim == 0):
+        shiftByConstInt = None
+        if node[1].cls == "Int":
+            shiftByConstInt = int(node[1].value)
+        elif (node[1].cls == "Neg") and (node[1][0].cls == "Int"):
+            shiftByConstInt = -int(node[1][0].value)
+            
+        if shiftByConstInt is None:
+            return "bitshift(%(0)s, %(1)s)"
+        else:
+            if shiftByConstInt > 0: # shift left  
+                return "((%(0)s) << " + str(shiftByConstInt) + ")"
+            else:
+                return "((%(0)s) >> " + str(-shiftByConstInt) + ")"
+    else:
+        return "mat_bitshift(%(0)s, %(1)s)"
 
 if __name__ == "__main__":
     import doctest

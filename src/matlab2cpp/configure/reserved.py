@@ -629,6 +629,15 @@ def Get_complex(node):
         node.type = "cx_mat"
     elif node[0].dim == 4:
         node.type = "cx_cube"
+        
+def Get_bitand(node):
+    node.type = [node[0].type, node[1].type]
+    
+Get_xor = Get_bitand
+Get_bitxor = Get_bitand
+
+def Get_bitshift(node):
+    node.type = node[0].type
 
 Get_tic = "string"
 
