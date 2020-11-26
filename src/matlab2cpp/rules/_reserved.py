@@ -29,7 +29,9 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
-    "global", "cat", "strcmp","strcmpi","class"
+    "global", "cat", "strcmp","strcmpi","class",
+    'uint64', 'uint32', 'uint16', 'uint8', 'int64', 'int32', 'int16', 'int8',
+    'logical', 'single', 'double', 'complex'
 }
 
 # Common attribute
@@ -1497,6 +1499,21 @@ def Get_strcmpi(node):
         txt += ".c_str()"
     txt += ") == 0)"  
     return txt
+
+def Get_uint64(node):
+    return "", "", ""
+
+Get_uint32 = Get_uint64
+Get_uint16 = Get_uint64
+Get_uint8 = Get_uint64
+Get_int64 = Get_uint64
+Get_int32 = Get_uint64
+Get_int16 = Get_uint64
+Get_int8 = Get_uint64          
+Get_logical = Get_uint64
+Get_single = Get_uint64
+Get_double = Get_uint64
+Get_complex = Get_uint64
 
 if __name__ == "__main__":
     import doctest

@@ -560,6 +560,75 @@ def Get_logspace(node):
 
 def Get_find(node):
     node.type = "uvec"
+    
+def Get_uint64(node):
+    if node[0].dim == 0:
+        node.type = "uword"
+    elif node[0].dim == 1:
+        node.type = "uvec"
+    elif node[0].dim == 2:
+        node.type = "urowvec"
+    elif node[0].dim == 3:
+        node.type = "umat"
+    elif node[0].dim == 4:
+        node.type = "ucube"
+        
+Get_uint32 = Get_uint64
+Get_uint16 = Get_uint64
+Get_uint8 = Get_uint64
+Get_logical = Get_uint64
+        
+def Get_int64(node):
+    if node[0].dim == 0:
+        node.type = "int"
+    elif node[0].dim == 1:
+        node.type = "ivec"
+    elif node[0].dim == 2:
+        node.type = "irowvec"
+    elif node[0].dim == 3:
+        node.type = "imat"
+    elif node[0].dim == 4:
+        node.type = "icube"
+        
+Get_int32 = Get_int64
+Get_int16 = Get_int64
+Get_int8 = Get_int64
+        
+def Get_double(node):
+    if node[0].dim == 0:
+        node.type = "double"
+    elif node[0].dim == 1:
+        node.type = "vec"
+    elif node[0].dim == 2:
+        node.type = "rowvec"
+    elif node[0].dim == 3:
+        node.type = "mat"
+    elif node[0].dim == 4:
+        node.type = "cube"
+        
+def Get_single(node):
+    if node[0].dim == 0:
+        node.type = "float"
+    elif node[0].dim == 1:
+        node.type = "fvec"
+    elif node[0].dim == 2:
+        node.type = "frowvec"
+    elif node[0].dim == 3:
+        node.type = "fmat"
+    elif node[0].dim == 4:
+        node.type = "fcube"
+        
+def Get_complex(node):
+    if node[0].dim == 0:
+        node.type = "cx_double"
+    elif node[0].dim == 1:
+        node.type = "cx_vec"
+    elif node[0].dim == 2:
+        node.type = "cx_rowvec"
+    elif node[0].dim == 3:
+        node.type = "cx_mat"
+    elif node[0].dim == 4:
+        node.type = "cx_cube"
 
 Get_tic = "string"
 
