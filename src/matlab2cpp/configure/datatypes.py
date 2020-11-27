@@ -172,6 +172,14 @@ def Vector(node):
 
     # default to common denominator
     node.type = [n.type for n in node]
+    
+    # Refine int or uword
+    if node.type == "int":
+        node.type = "uword"
+        for n in node:
+            if n.cls == "Neg":
+                node.type = "int"
+                break       
 
     # dimensionality in vector
     dims = {n.dim for n in node}
