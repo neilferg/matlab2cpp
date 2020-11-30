@@ -50,6 +50,10 @@ matlabTypes_mem = {
     'single':  2, # float
     'double':  3, # double
     'complex': 4, # complex
+    
+    # Armadillo types
+    'uword':   0,
+    'int':     1,
 }
 
 
