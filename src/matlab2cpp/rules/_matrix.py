@@ -88,8 +88,12 @@ def Matrix(node):
     elif all([n.value for n in node]):
 
         # Inline matrices are moved to own lines
-        if node.parent.cls not in ("Assign", "Statement") and \
-                    node.parent.backend != "reserved":
+        do = node.parent.cls not in ("Assign", "Statement")
+        if node.parent.backend == "reserved":
+            # NF_DEBUG: what reserved commands is un-inlining not applicable to?
+            pass #do = do and node.parent.name in [ "transpose" ]
+        
+        if do:
             if node.parent.cls in ("Get", "Set") and node.mem != 0:
                 if node.parent.type == "TYPE":
                     node.type = (node.dim, 3)

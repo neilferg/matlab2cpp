@@ -1,37 +1,9 @@
+from  .. import node_utils
+
 Var_false = "int"
 Var_true = "int"
 Var_pi = "double"
 Get_linspace = "rowvec"
-
-strClassType2Mem = {
-    'uint64':  0, # uword
-    'uint32':  0,
-    'uint16':  0,
-    'uint8':   0,
-    'int64':   1, # int
-    'int32':   1,
-    'int16':   1,
-    'int8':    1,
-    'logical': 0, # uword
-    'single':  2, # float
-    'double':  3, # double
-    'complex': 4, # complex
-}
-
-def _extractMemClass(node):
-    # Look for a class(var) or string type literal (e.g 'uint32'). Extract if
-    # present. Return the number of leading nodes that comprise the dimensions
-    mem = None
-    numDims = 0
-    for cn in node:
-        if (cn.backend == 'reserved') and (cn.name == 'class'): # class(var)
-            mem = cn[0].mem
-        elif cn.cls == "String": # 'uint32'
-            mem = strClassType2Mem.get(cn.value, None)
-        else:
-            numDims += 1
-
-    return numDims, mem
 
 def Get_exp(node):
     node.type = node[0].type
@@ -323,6 +295,8 @@ def Get_eye(node):
     #set eye type to cx_mat if LHS is complex type
     if node.group.cls == "Assign" and node.group[0].mem == 4:
         node.type = "cx_mat"
+    elif node.group[0].type != 'TYPE':   
+        node.type = node.group[0].type
     else:
         node.type = "mat"
     
@@ -379,12 +353,20 @@ def Get_ctranspose(node):
 def Get_zeros(node):
 
     node.type = "uword"
-    dim, mem = node.suggest_datatype()
     
-    numDims, memFromClass = _extractMemClass(node)
-
-    if dim is None and mem is None:
-        mem = memFromClass
+    # Check for an explicit cast by the parent - e.g uint32(xxx)
+    castedMem = node_utils.isBeingCastedToMemType(node)
+    mem = castedMem
+    
+    # The first numDims nodes are dimensions
+    # explicitMem is a user specified type
+    numDims, explicitMem = node_utils.parseNumDimsAndExplicitMem(node)
+    if mem is None:
+        mem = explicitMem
+        
+    dim, suggestedMem = node.suggest_datatype()
+    if mem is None:
+        mem = suggestedMem
 
     # set memory type
     if not (mem is None):
@@ -397,10 +379,10 @@ def Get_zeros(node):
     #        node.mem = 4
 
     # reset to uword if arg of array-node
-    if node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
+    if (castedMem is None) and node.group.cls in ("Get", "Cget", "Fget", "Nget", "Sget", "Set", "Cset",
             "Fset", "Nset", "Sset") and node.group.num:
         node.mem = 0
-        if len(node) == 2 and node[0].cls == "Int" and node[0].value == "1":
+        if numDims == 2 and node[0].cls == "Int" and node[0].value == "1":
             node.dim = 1
             return
     
@@ -426,11 +408,11 @@ def Get_zeros(node):
         if dim == 3:
             node.dim = 3
 
-        # use colvec if first index is '1'
+        # use rowvec if first index is '1'
         elif node[0].cls == "Int" and node[0].value == "1":
             node.dim = 2
 
-        # use rowvec if second index is '1'
+        # use colvec if second index is '1'
         elif node[1].cls == "Int" and node[1].value == "1":
             node.dim = 1
 
@@ -443,6 +425,44 @@ def Get_zeros(node):
         node.dim = 4
 
 Get_ones = Get_zeros
+        
+def Get_true(node):
+    node.type = "uword"
+    
+    # The first numDims nodes are dimensions
+    numDims = node_utils.parseNumDimsAndExplicitMem(node)[0]
+    dim = node.suggest_datatype()[0]
+    
+    if numDims == 1:   
+        # arg input is vector
+        if node[0].num and node[0].dim in (1,2):
+            pass
+        else:
+            # use suggestions or defualts
+            if dim in (1,2,3):
+                node.dim = dim
+            else:
+                node.dim = 3 # default
+    elif numDims == 2: # creates colvec/rowvec/matrix depending on context
+        # use matrix, if suggested
+        if dim == 3:
+            node.dim = 3
+
+        # use rowvec if first index is '1'
+        elif node[0].cls == "Int" and node[0].value == "1":
+            node.dim = 2
+
+        # use colvec if second index is '1'
+        elif node[1].cls == "Int" and node[1].value == "1":
+            node.dim = 1
+
+        # default to matrix
+        else:
+            node.dim = 3
+    elif numDims == 3: # create cube
+        node.dim = 4
+
+Get_false = Get_true
 
 Var_rand = "vec"
 
@@ -562,16 +582,9 @@ def Get_find(node):
     node.type = "uvec"
     
 def Get_uint64(node):
-    if node[0].dim == 0:
+    if node[0].dim is not None:
         node.type = "uword"
-    elif node[0].dim == 1:
-        node.type = "uvec"
-    elif node[0].dim == 2:
-        node.type = "urowvec"
-    elif node[0].dim == 3:
-        node.type = "umat"
-    elif node[0].dim == 4:
-        node.type = "ucube"
+        node.dim = node[0].dim
         
 Get_uint32 = Get_uint64
 Get_uint16 = Get_uint64
@@ -579,56 +592,28 @@ Get_uint8 = Get_uint64
 Get_logical = Get_uint64
         
 def Get_int64(node):
-    if node[0].dim == 0:
+    if node[0].dim is not None:
         node.type = "int"
-    elif node[0].dim == 1:
-        node.type = "ivec"
-    elif node[0].dim == 2:
-        node.type = "irowvec"
-    elif node[0].dim == 3:
-        node.type = "imat"
-    elif node[0].dim == 4:
-        node.type = "icube"
+        node.dim = node[0].dim
         
 Get_int32 = Get_int64
 Get_int16 = Get_int64
 Get_int8 = Get_int64
         
 def Get_double(node):
-    if node[0].dim == 0:
+    if node[0].dim is not None:
         node.type = "double"
-    elif node[0].dim == 1:
-        node.type = "vec"
-    elif node[0].dim == 2:
-        node.type = "rowvec"
-    elif node[0].dim == 3:
-        node.type = "mat"
-    elif node[0].dim == 4:
-        node.type = "cube"
+        node.dim = node[0].dim
         
 def Get_single(node):
-    if node[0].dim == 0:
+    if node[0].dim is not None:
         node.type = "float"
-    elif node[0].dim == 1:
-        node.type = "fvec"
-    elif node[0].dim == 2:
-        node.type = "frowvec"
-    elif node[0].dim == 3:
-        node.type = "fmat"
-    elif node[0].dim == 4:
-        node.type = "fcube"
+        node.dim = node[0].dim
         
 def Get_complex(node):
-    if node[0].dim == 0:
+    if node[0].dim is not None:
         node.type = "cx_double"
-    elif node[0].dim == 1:
-        node.type = "cx_vec"
-    elif node[0].dim == 2:
-        node.type = "cx_rowvec"
-    elif node[0].dim == 3:
-        node.type = "cx_mat"
-    elif node[0].dim == 4:
-        node.type = "cx_cube"
+        node.dim = node[0].dim
         
 def Get_bitand(node):
     node.type = [node[0].type, node[1].type]
@@ -638,6 +623,15 @@ Get_bitxor = Get_bitand
 
 def Get_bitshift(node):
     node.type = node[0].type
+      
+def Get_repmat(node):
+    node.type = node[0].type
+    if (node.dim is not None): # only if node.type is defined
+        dimIdxStart = 1
+        numDimArgs = node_utils.parseNumDimsAndExplicitMem(node.children[dimIdxStart:])[0]
+        dim = node_utils.getDimFromNumDimArgs(node, numDimArgs, dimIdxStart)
+        if dim is not None:
+            node.dim = dim
 
 Get_tic = "string"
 

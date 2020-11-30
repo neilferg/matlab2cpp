@@ -1,6 +1,6 @@
 import matlab2cpp
 from .assign import Assign
-import rule_helpers
+from .. import node_utils
 
 def Paren(node):
     """Parenthesis surounding expression.
@@ -745,7 +745,7 @@ Examples:
             if node.group.cls == "Assign":
                 return "arma::regspace<" + node.group[0].type + ">" + args
             
-            node.type = rule_helpers.deduceTemplateType(node)
+            node.type = node_utils.deduceTemplateType(node)
             
             return "arma::regspace<" + node.type + ">" + args
 

@@ -37,6 +37,21 @@ mems = [mem0, mem1, mem2, mem3, mem4]
 others = {"char", "string", "TYPE", "func_lambda", "struct", "structs", "cell",
         "wall_clock", "SPlot"}
 
+matlabTypes_mem = {
+    'uint64':  0, # uword
+    'uint32':  0,
+    'uint16':  0,
+    'uint8':   0,
+    'int64':   1, # int
+    'int32':   1,
+    'int16':   1,
+    'int8':    1,
+    'logical': 0, # uword
+    'single':  2, # float
+    'double':  3, # double
+    'complex': 4, # complex
+}
+
 
 def common_loose(vals):
     """Common denominator among several names.

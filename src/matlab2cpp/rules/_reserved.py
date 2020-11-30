@@ -6,6 +6,7 @@ set of the various reserved words implemented into matlab2cpp.
 """
 
 import matlab2cpp
+from .. import node_utils
 
 # List of function names that should be handled by reserved.py:
 reserved = {
@@ -33,7 +34,9 @@ reserved = {
     'uint64', 'uint32', 'uint16', 'uint8', 'int64', 'int32', 'int16', 'int8',
     'logical', 'single', 'double', 'complex',
     'xor', 'bitand', 'bitxor',
-    'bitshift'
+    'bitshift',
+    "true", "false",
+    "repmat",
 }
 
 # Common attribute
@@ -302,7 +305,10 @@ def Get_all(node):
     return "all(", ", ", ")"
 
 def Get_isequal(node):
-    return "%(0)s == %(1)s"
+    if node[0].dim == 0 and node[1].dim == 0:
+        return "%(0)s == %(1)s"
+    else:
+        return 'approx_equal(%(0)s, %(1)s, "absdiff", 0)'
 
 def Var_return(node):
 
@@ -661,8 +667,6 @@ def Get_eye(node):
     # not numerical input
     if not node[0].num:
         return "eye(", ", ", ")"
-    
-    node.type = node.group[0].type
 
     # single argument constructor
     if len(node) == 1:
@@ -698,72 +702,24 @@ def Get_flipud(node):
     return "arma::flipud(%(0)s)"
 
 
-def Get_ones(node):
+def _bulkfill(node, armaFn):
+
+    numDimArgs = node_utils.parseNumDimsAndExplicitMem(node)[0]
 
     # one argument
-    if len(node) == 1:
-        #size as argument: zeros(size(A))
+    if numDimArgs == 1:
+        # size as argument: zeros(size(A))
         if node[0].backend == "reserved" and node[0].name == "size":
-            #Take the type of the LHS, normally it is the other way around
+            # Take the type of the LHS, normally it is the other way around
             if node.parent.cls == "Assign" and node.parent[0] != node:
-                out = "arma::ones<" + node.parent[0].type + ">("
+                out = armaFn+"<" + node.parent[0].type + ">("
                 return out, ", ", ")"
-            #return "arma::ones<%(type)s>(", ", ", ")"
 
         #arg input is a scalar
         if node[0].num and node[0].dim == 0:
             #dim is matrix
             if node.dim == 3:
-                return "arma::ones<%(type)s>(%(0)s, %(0)s)"
-
-        # arg input is vector
-        if node[0].num and node[0].dim in (1,2):
-
-            # non-trivial variables moved out to own line
-            if node[0].cls != "Var":
-                node[0].auxiliary()
-
-            # indexing arg as input
-            if node.dim in (1,2):
-                return "arma::ones<%(type)s>(%(0)s(0))"
-            if node.dim == 3:
-                return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1))"
-            if node.dim == 4:
-                return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
-
-    # two args where one vector and other "1" handled specially
-    elif len(node) == 2:
-
-        if node.dim == 3:
-            return "arma::ones<%(type)s>(%(0)s, %(1)s)"
-
-        if node.dim in (1,2):
-            if node[0].cls == "Int" and node[0].value == "1":
-                return "arma::ones<%(type)s>(%(1)s)"
-            if node[1].cls == "Int" and node[1].value == "1":
-                return "arma::ones<%(type)s>(%(0)s)"
-
-    return "arma::ones<%(type)s>(", ", ", ")"
-
-
-def Get_zeros(node):
-
-    # one argument
-    if len(node) == 1:
-
-        #size as argument: zeros(size(A))
-        if node[0].backend == "reserved" and node[0].name == "size":
-            #Take the type of the LHS, normally it is the other way around
-            if node.parent.cls == "Assign" and node.parent[0] != node:
-                out = "arma::zeros<" + node.parent[0].type + ">("
-                return out, ", ", ")"
-            #return "arma::zeros<%(type)s>(", ", ", ")"
-
-        #arg input is a scalar
-        if node[0].num and node[0].dim == 0:
-            #dim is matrix
-            if node.dim == 3:
-                return "arma::zeros<%(type)s>(%(0)s, %(0)s)"
+                return armaFn+"<%(type)s>(%(0)s, %(0)s)"
 
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
@@ -774,29 +730,44 @@ def Get_zeros(node):
 
             # indexing arg as input if vector
             if node.dim in (1,2):
-                return "arma::zeros<%(type)s>(%(0)s(0))"
+                return armaFn+"<%(type)s>(%(0)s(0))"
             if node.dim == 3:
-                return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1))"
+                return armaFn+"<%(type)s>(%(0)s(0), %(0)s(1))"
             if node.dim == 4:
-                return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
+                return armaFn+"<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
 
     # double argument creates colvec/rowvec/matrix depending on context
-    elif len(node) == 2:
+    elif numDimArgs == 2:
 
         if node.dim == 3:
-            return "arma::zeros<%(type)s>(%(0)s, %(1)s)"
+            return armaFn+"<%(type)s>(%(0)s, %(1)s)"
 
         if node.dim in (1,2):
             # use colvec if first index is '1'
             if node[0].cls == "Int" and node[0].value == "1":
-                return "arma::zeros<%(type)s>(%(1)s)"
+                return armaFn+"<%(type)s>(%(1)s)"
 
             # use rowvec if second index is '1'
             elif node[1].cls == "Int" and node[1].value == "1":
-                return "arma::zeros<%(type)s>(%(0)s)"
+                return armaFn+"<%(type)s>(%(0)s)"
 
-    return "arma::zeros<%(type)s>(", ", ", ")"
+    else: # cube?
+        pass
 
+    return armaFn+"<%(type)s>(", ", ", ")"
+
+def Get_ones(node):
+    return _bulkfill(node, 'arma::ones')
+
+def Get_zeros(node):
+    return _bulkfill(node, 'arma::zeros')
+
+def Get_true(node):
+    return _bulkfill(node, 'arma::ones')
+
+def Get_false(node):
+    return _bulkfill(node, 'arma::zeros')
+    
 def Get_qr(node):
     return "", ", ", ""
 
@@ -1537,21 +1508,31 @@ def Get_bitxor(node):
 
 def Get_bitshift(node):
     if (node[0].dim == 0):
-        shiftByConstInt = None
-        if node[1].cls == "Int":
-            shiftByConstInt = int(node[1].value)
-        elif (node[1].cls == "Neg") and (node[1][0].cls == "Int"):
-            shiftByConstInt = -int(node[1][0].value)
-            
-        if shiftByConstInt is None:
-            return "bitshift(%(0)s, %(1)s)"
-        else:
+        shiftByConstInt = node_utils.getConstInt(node)    
+        if shiftByConstInt is not None:
             if shiftByConstInt > 0: # shift left  
                 return "((%(0)s) << " + str(shiftByConstInt) + ")"
             else:
                 return "((%(0)s) >> " + str(-shiftByConstInt) + ")"
-    else:
-        return "mat_bitshift(%(0)s, %(1)s)"
+            
+    return "mat_bitshift(%(0)s, %(1)s)"
+
+def Get_repmat(node):
+    dimIdxStart = 1
+    numDimArgs = node_utils.parseNumDimsAndExplicitMem(node.children[dimIdxStart:])[0]
+    dimArgs = node_utils.renderDimNodeArgs(numDimArgs, dimIdxStart)
+    
+    # scalar
+    if node.parent.cls == 'Assign' and node[0].dim in [None, 0]:
+        # TODO: can simplify this: if a vec, then set_size() just needs one arg
+        return node.parent[0].str+".set_size("+dimArgs+"); "+node.parent[0].str+".fill(%(0)s)"
+    
+    return "repmat(", ", ", ")"
+
+def Assign_repmat(node):
+    if '.set_size' in node[1].str:
+        return "%(1)s ;" # delete the var = bit
+    return "%(0)s = %(1)s ;"
 
 if __name__ == "__main__":
     import doctest
