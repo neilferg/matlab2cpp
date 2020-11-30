@@ -54,6 +54,13 @@ Example:
     
     if node.declare.type != "TYPE":
         node.type = node.declare.type
+        
+    # If the variable is being used as an index list (as, say, from find())
+    # then the type should to be 'uvec' which is what .elem() access requires   
+    if node.type == "TYPE":
+        if ((len(node.group) > 1) and (node.group[1].cls == "Get") and (node.group[1].name == 'find')) or \
+            node.name.startswith('idxs'): # convention
+            node.type = "uvec"
 
 
 def Get(node):
