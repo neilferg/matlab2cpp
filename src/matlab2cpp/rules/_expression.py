@@ -747,7 +747,7 @@ Examples:
             
             node.type = node_utils.deduceTemplateType(node)
             
-            return "arma::regspace<" + node.type + ">" + args
+            return "arma::regspace<" + node.type + ">" +args
 
 
 if __name__ == "__main__":

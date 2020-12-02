@@ -62,3 +62,24 @@ def deduceTemplateType(node):
         return carg_node.type
     return 'TYPE' # unknown
 
+def spanForAll(args, node):
+    # The cube class doesn't have the full range of int/span index arg combos
+    # like the mat class does (probably because there are too many combinations)
+    # So, if one of the args has a span, all of them will need one too.
+    # We also need to expand the arg against the node when searching for the
+    # presence of a span
+    
+    anySpans = False
+    for a in args:
+        value = a % node.properties()
+        if value.find('span') != -1:
+            anySpans=True
+            break
+    
+    for i, a in enumerate(args):
+        value = a % node.properties()
+        if anySpans and (value.find('span') == -1):
+            args[i] = 'span(' + a + ')'
+            
+    return args
+

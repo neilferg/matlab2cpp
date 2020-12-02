@@ -425,44 +425,6 @@ def Get_zeros(node):
         node.dim = 4
 
 Get_ones = Get_zeros
-        
-def Get_true(node):
-    node.type = "uword"
-    
-    # The first numDims nodes are dimensions
-    numDims = node_utils.parseNumDimsAndExplicitMem(node)[0]
-    dim = node.suggest_datatype()[0]
-    
-    if numDims == 1:   
-        # arg input is vector
-        if node[0].num and node[0].dim in (1,2):
-            pass
-        else:
-            # use suggestions or defualts
-            if dim in (1,2,3):
-                node.dim = dim
-            else:
-                node.dim = 3 # default
-    elif numDims == 2: # creates colvec/rowvec/matrix depending on context
-        # use matrix, if suggested
-        if dim == 3:
-            node.dim = 3
-
-        # use rowvec if first index is '1'
-        elif node[0].cls == "Int" and node[0].value == "1":
-            node.dim = 2
-
-        # use colvec if second index is '1'
-        elif node[1].cls == "Int" and node[1].value == "1":
-            node.dim = 1
-
-        # default to matrix
-        else:
-            node.dim = 3
-    elif numDims == 3: # create cube
-        node.dim = 4
-
-Get_false = Get_true
 
 Var_rand = "vec"
 
@@ -580,6 +542,50 @@ def Get_logspace(node):
 
 def Get_find(node):
     node.type = "uvec"
+
+Get_tic = "string"
+
+Get_toc = "string"
+
+# ----------------------------------------------
+
+def Get_true(node):
+    node.type = "uword"
+    
+    # The first numDims nodes are dimensions
+    numDims = node_utils.parseNumDimsAndExplicitMem(node)[0]
+    dim = node.suggest_datatype()[0]
+    
+    if numDims == 1:   
+        # arg input is vector
+        if node[0].num and node[0].dim in (1,2):
+            pass
+        else:
+            # use suggestions or defualts
+            if dim in (1,2,3):
+                node.dim = dim
+            else:
+                node.dim = 3 # default
+    elif numDims == 2: # creates colvec/rowvec/matrix depending on context
+        # use matrix, if suggested
+        if dim == 3:
+            node.dim = 3
+
+        # use rowvec if first index is '1'
+        elif node[0].cls == "Int" and node[0].value == "1":
+            node.dim = 2
+
+        # use colvec if second index is '1'
+        elif node[1].cls == "Int" and node[1].value == "1":
+            node.dim = 1
+
+        # default to matrix
+        else:
+            node.dim = 3
+    elif numDims == 3: # create cube
+        node.dim = 4
+
+Get_false = Get_true
     
 def Get_uint64(node):
     if node[0].dim is not None:
@@ -633,6 +639,3 @@ def Get_repmat(node):
         if dim is not None:
             node.dim = dim
 
-Get_tic = "string"
-
-Get_toc = "string"

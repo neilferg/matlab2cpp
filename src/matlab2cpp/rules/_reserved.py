@@ -708,9 +708,9 @@ def _bulkfill(node, armaFn):
 
     # one argument
     if numDimArgs == 1:
-        # size as argument: zeros(size(A))
+        #size as argument: zeros(size(A))
         if node[0].backend == "reserved" and node[0].name == "size":
-            # Take the type of the LHS, normally it is the other way around
+            #Take the type of the LHS, normally it is the other way around
             if node.parent.cls == "Assign" and node.parent[0] != node:
                 out = armaFn+"<" + node.parent[0].type + ">("
                 return out, ", ", ")"
@@ -760,12 +760,6 @@ def Get_ones(node):
     return _bulkfill(node, 'arma::ones')
 
 def Get_zeros(node):
-    return _bulkfill(node, 'arma::zeros')
-
-def Get_true(node):
-    return _bulkfill(node, 'arma::ones')
-
-def Get_false(node):
     return _bulkfill(node, 'arma::zeros')
     
 def Get_qr(node):
@@ -1444,6 +1438,15 @@ def Get_logspace(node):
 
 def Get_find(node):
     return "find(", ", ", ") + 1"
+
+
+# --------------------------------------------
+
+def Get_true(node):
+    return _bulkfill(node, 'arma::ones')
+
+def Get_false(node):
+    return _bulkfill(node, 'arma::zeros')
 
 def Get_global(node):
     return "// global %(0)s"
