@@ -209,8 +209,9 @@ def Struct(node):
 
         declares[type].append(child)
 
-    for key, val in declares.items():
-        out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
+    for typ, fields in declares.items():
+        for field in fields:
+            out += "\n" + typ + " " + str(field) + " ;"
     out = out + "\n} ;"
 
     # out = add_indenting(out)
