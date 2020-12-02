@@ -28,7 +28,13 @@ def Vector(node):
 
     #max mem in list and type list
     try:
-        mem = max([int(n.mem) if n.num else -1 for n in node])
+        mems = []
+        for n in node:
+            m = n.mem
+            if n.cls == 'Int' and int(n.value) >= 0:
+                m = 0
+            mems.append(m)
+        mem = max(mems)
     except:
         mem = -1
     mem_type = ["uword", "sword", "float", "double", "cx_double"]
