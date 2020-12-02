@@ -305,10 +305,7 @@ def Get_all(node):
     return "all(", ", ", ")"
 
 def Get_isequal(node):
-    if node[0].dim == 0 and node[1].dim == 0:
-        return "%(0)s == %(1)s"
-    else:
-        return 'approx_equal(%(0)s, %(1)s, "absdiff", 0)'
+    return "%(0)s == %(1)s"
 
 def Var_return(node):
 
