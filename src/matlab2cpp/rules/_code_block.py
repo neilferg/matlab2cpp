@@ -674,6 +674,7 @@ Examples:
             return out
 
         else:
+            # NF_DEBUG: This doesn't work when the loop is counting backwards
             out = "for (%(0)s=" + start + \
                   "; %(0)s<=" + stop + "; %(0)s"
 
