@@ -30,7 +30,7 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
-    "global", "cat", "strcmp","strcmpi","class",
+    "global", "cat", "strcmp","strcmpi","class","class_typestring",
     'uint64', 'uint32', 'uint16', 'uint8', 'int64', 'int32', 'int16', 'int8',
     'logical', 'single', 'double', 'complex',
     'xor', 'bitand', 'bitxor',
@@ -1447,6 +1447,20 @@ def Get_false(node):
 
 def Get_global(node):
     return "// global %(0)s"
+
+def Get_class(node):
+    return "_M2CPP_DELETE_ITEM_"
+
+def Get_class_typestring(node):
+    if node.parent.cls == 'Assign':
+        return "%(0)s"
+    elif node.parent.cls == 'Get':
+        # For handlers that use node_utils.parseNumDimsAndExplicitMem()
+        # we pass the string to them. Otherwise we mark the arg for deletion
+        if node.parent.name in ['zeros', 'ones', 'repmat']:
+            return "%(0)s"
+        
+    return "_M2CPP_DELETE_ITEM_"
 
 def Get_cat(node):
     if node[0].value == '1':

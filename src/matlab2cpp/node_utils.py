@@ -10,6 +10,8 @@ def parseNumDimsAndExplicitMem(node):
     for cn in node:
         if (cn.backend == 'reserved') and (cn.name == 'class'): # class(var)
             mem = cn[0].mem
+        elif cn.cls == "Get" and (cn.name == 'class_typestring'):
+            mem = datatype.matlabTypes_mem.get(cn[0].value, None)
         elif cn.cls == "String": # 'uint32'
             mem = datatype.matlabTypes_mem.get(cn.value, None)
         else:

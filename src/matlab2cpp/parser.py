@@ -110,5 +110,10 @@ def create_parser():
         "-n", '--nargin', action="store_true", help=(
             "Don't remove if and switch branches which use nargin variable."),
     )
+    
+    parser.add_argument(
+        "-P", '--preprocessed-file', dest="preprocessed_file", default=None, help=(
+            "Use preprocessed file, but take configs from the real file."),
+    ) 
 
     return parser
