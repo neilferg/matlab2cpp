@@ -1,4 +1,5 @@
 import datatype
+from tree import findend
 
 
 def parseNumDimsAndExplicitMem(node):
@@ -82,4 +83,13 @@ def spanForAll(args, node):
             args[i] = 'span(' + a + ')'
             
     return args
+
+def skipStuff(node, k, skipChars = " \t\n;,", skipComment=False):
+    while True:
+        if node.code[k] in skipChars:
+            k += 1
+        elif (node.code[k] == "%") and skipComment:
+            k = findend.comment(node, k)
+        else:
+            return k
 
