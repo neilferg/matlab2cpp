@@ -31,6 +31,8 @@ def Vector(node):
         mems = []
         for n in node:
             m = n.mem
+            if (m is None): # struct field returns mem = None
+                raise Exception("BAAD") 
             if n.cls == 'Int' and int(n.value) >= 0:
                 m = 0
             mems.append(m)
