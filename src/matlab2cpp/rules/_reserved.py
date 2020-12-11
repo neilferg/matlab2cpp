@@ -483,8 +483,21 @@ def Assigns_unique(node):
 
 def Get_sortrows(node):
     node.include("m2cpp")
-    args = ", ".join([n.str for n in node])
-    return "m2cpp::sortrows(" + args + ");"
+    return "", ", ", ""
+
+def Assign_sortrows(node):
+    node.include("m2cpp")
+    lhs, rhs = node
+    my_list = []
+    for n in rhs:
+        my_list.append(n.str)
+    my_string = ", ".join(my_list)
+    return "%(0)s = m2cpp::sortrows(" + my_string + ") ;"
+
+def Assigns_sortrows(node):
+    # [B, index] = sortrows(A) ->  m2cpp::sortrows(B, index, A)
+    rhs = ", ".join([n.str for n in node])
+    return "m2cpp::sortrows(" + rhs + ") ;"
 
 def Get_intersect(node):
     node.include("m2cpp")
