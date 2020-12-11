@@ -44,8 +44,7 @@ Args:
         if args.disp:
             print("building tree...")
 
-        args.filename = os.path.abspath(args.filename)
-        filenames = [args.filename]
+        filenames = [os.path.abspath(args.filename)]
 
         stack = []
         while filenames:
@@ -60,11 +59,8 @@ Args:
                 print("loading", filename)
 
             stack.append(filename)
-            
-            if (filename == args.filename) and (args.preprocessed_file is not None):
-                f = open(args.preprocessed_file, "rU")
-            else:
-                f = open(filename, "rU")
+
+            f = open(filename, "rU")
             code = f.read()
             f.close()
 
