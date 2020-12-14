@@ -87,6 +87,8 @@ def Matrix(node):
         return "{", ", ", "}"
 
     dims = {n.dim for n in node}
+    
+    nodes = None # to trap unassigned nodes
 
     # single vector with no content
     if len(node) == 1 and len(node[0]) == 0:
@@ -151,6 +153,11 @@ def Matrix(node):
                 nodes.append(str(node[idx].auxiliary()))
             else:
                 nodes.append(str(node[idx]))
+             
+    if nodes is None:
+        print('BAAD: Matrix in ', node.func.name, node.code)
+        out = node.code+ ' /*FIXME Matrix*/'
+        return out
 
     out = str(nodes[0])
     for node_ in nodes[1:]:
