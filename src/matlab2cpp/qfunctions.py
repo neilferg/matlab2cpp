@@ -172,11 +172,11 @@ See also:
         if includes.str:
             out += includes.str + "\n\n"
 
-        if len(headers) > 1:
-            out += headers.str + "\n\n"
-
         if structs.str:
             out += structs.str + "\n\n"
+
+        if len(headers) > 1:
+            out += headers.str + "\n\n"
 
         if funcs.str:
             out += funcs.str + "\n\n"
@@ -290,11 +290,11 @@ See also:
     if includes.str:
         out += includes.str + "\n\n"
 
-    if len(headers) > 1:
-        out += headers.str + "\n\n"
-
     if structs.str:
         out += structs.str + "\n\n"
+
+    if len(headers) > 1:
+        out += headers.str + "\n\n"
 
     if funcs.str:
         out += funcs.str + "\n\n"
