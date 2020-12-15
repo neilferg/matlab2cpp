@@ -113,7 +113,10 @@ See also:
         if node.type == "TYPE":
             type = node.declare.prop.get("suggest", "TYPE")
             if type != "TYPE":
-                type = "(" + type + ")"
+                # Can get garbage suggestions too. Have seen things like
+                # '(0,3)' - a tuple. str() the result and allow user to
+                # do the filtering
+                type = "(" + str(type) + ")"
         else:
             type = node.type
         out += type.ljust(8)

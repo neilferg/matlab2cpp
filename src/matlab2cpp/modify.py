@@ -255,7 +255,7 @@ def add_parameters(project):
 
                 # add or reuse variables, also add change
                 while func_ret_num < len(return_params):
-                    if return_params[func_ret_num].type not in ("TYPE", "string"):
+                    if return_params[func_ret_num].type not in ("TYPE", "string", "cell"):
                         type_counter[return_params[func_ret_num].type] += 1
                         name = "_tmp_" + return_params[func_ret_num].type + \
                                str(type_counter[return_params[func_ret_num].type])
