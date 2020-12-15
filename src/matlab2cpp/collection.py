@@ -254,6 +254,43 @@ class Inlines(Node):
 class Structs(Node):
     def __init__(self, parent, **kws):
         Node.__init__(self, parent, **kws)
+        
+    def __contains__(self, i):
+        if isinstance(i, str):
+            nsname = self.structNsName(i)
+        else: # Node
+            nsname = i.structNsName()
+        
+        return nsname in self.names
+        
+    def __getitem__(self, index):
+        i = index
+    
+        if isinstance(i, Node):
+            structNsName = i.structNsName()
+            
+            if structNsName not in self.names:
+                raise IndexError("node child \"%s\" not found" % i)
+            i = self.names.index(structNsName)
+        elif isinstance(i, str):   
+            structNsName = self.structNsName(i) # NOTE: using self's namespace
+            
+            if structNsName not in self.names:
+                raise IndexError("node child \"%s\" not found" % i)
+            i = self.names.index(structNsName)
+
+        if isinstance(i, int):
+            if len(self) <= i:
+                raise IndexError(
+                        "index of %s out of range (%d)" % (self.cls, i))
+            return self.children[i]
+
+        if isinstance(i, slice):
+            return self.children[i]
+
+        raise TypeError(
+                "index of %s must be in (int, str, slice, Node), not %s" \
+                % (self.cls, i.__class__.__name__))    
 
 class Headers(Node):
     def __init__(self, parent, **kws):

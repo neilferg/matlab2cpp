@@ -333,7 +333,7 @@ Returns:
         assert structs.cls == "Structs"
 
         if node not in structs:
-            struct = matlab2cpp.collection.Struct(structs, name=node.name)
+            struct = matlab2cpp.collection.Struct(structs, name=node.structNsName())
         else:
             struct = structs[node]
 
@@ -353,7 +353,7 @@ Returns:
         else:
             if node.name not in declares.names:
                 var = matlab2cpp.collection.Var(declares, name=node.name, value=value)
-                var.type="struct"
+                var.type=node.structNsName()
 
         return matlab2cpp.collection.Var(struct, name=value)
         parent = struct
@@ -532,6 +532,8 @@ See also:
         backend = node.backend
         if backend == "TYPE":
             backend = "unknown"
+        elif backend.startswith('struct__'):
+            backend = 'struct'
 
         assert "_"+backend in matlab2cpp.rules.__dict__, (
             "No rule {}; ensure your .py file is properly set up.".format(backend))

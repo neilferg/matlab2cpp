@@ -523,6 +523,11 @@ Return:
 Prepare the code for plotting functionality.
         """
         return backend.plotting(self)
+    
+    def structNsName(self, name=None):
+        if name is None:
+            name = self.name
+        return 'struct__'+self.func.name+'_'+name
 
 
 if __name__ == "__main__":
