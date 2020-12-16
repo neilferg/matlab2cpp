@@ -83,3 +83,8 @@ def Set(node):
         return "%(name)s(" + arg0 + ", " + arg1 + ")"
 
     return "%(name)s(", ", ", ")"
+
+def Resize(node):
+    print('BAAD: NO CODE OUTPUT! Resize in ', node.func.name, node.code)
+    return "", "", ""
+

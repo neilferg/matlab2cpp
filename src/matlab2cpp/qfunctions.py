@@ -172,16 +172,17 @@ See also:
         if includes.str:
             out += includes.str + "\n\n"
 
-        if len(headers) > 1:
-            out += headers.str + "\n\n"
-
         if structs.str:
             out += structs.str + "\n\n"
+
+        if len(headers) > 1:
+            out += headers.str + "\n\n"
 
         if funcs.str:
             out += funcs.str + "\n\n"
 
         out = out.replace("__percent__", "%")
+        out = out.replace("// __BLANK_LINE__", "")
 
         out =  out[:-2]
 
@@ -193,7 +194,31 @@ See also:
     return out
 
 
-def qhpp(code, suggest=False):
+def qtypes(code):
+    from . import tree
+
+    if isinstance(code, str):
+        tree_ = build(code, suggest=suggest, retall=True)[0]
+
+    else:
+        tree_ = code
+        if isinstance(tree_, tree.builder.Builder):
+            tree_ = tree_[0]
+
+    tree_ = tree_.program
+
+    if not tree_.str:
+        tree_.translate()
+
+    includes, funcs, inlines, structs, headers, log = tree_
+    
+    out = ""
+    if structs.str:
+        out += structs.str + "\n\n"
+    
+    return out
+
+def qhpp(code, suggest=False, typesHeader=None):
     """
 Quick module translation of Matlab module to C++ library. If the code is
 a script, executable part of the code will be placed in
@@ -289,11 +314,14 @@ See also:
     if includes.str:
         out += includes.str + "\n\n"
 
+    if typesHeader is not None:
+        out += "#include <"+typesHeader+">\n\n"
+    else:
+        if structs.str:
+            out += structs.str + "\n\n"
+
     if len(headers) > 1:
         out += headers.str + "\n\n"
-
-    if structs.str:
-        out += structs.str + "\n\n"
 
     if funcs.str:
         out += funcs.str + "\n\n"
@@ -304,6 +332,7 @@ See also:
         out += "\n#endif"
 
     out = out.replace("__percent__", "%")
+    out = out.replace("// __BLANK_LINE__", "")
     from .rules._program import add_indenting, number_fix, strip
     out = strip(out)
     out = number_fix(out)
@@ -587,6 +616,7 @@ Example:
 
 
     out = out.replace("__percent__", "%")
+    out = out.replace("// __BLANK_LINE__", "")
     from .rules._program import add_indenting, number_fix, strip
     out = strip(out)
     out = number_fix(out)

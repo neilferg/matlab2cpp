@@ -6,6 +6,7 @@ set of the various reserved words implemented into matlab2cpp.
 """
 
 import matlab2cpp
+from .. import node_utils
 
 # List of function names that should be handled by reserved.py:
 reserved = {
@@ -29,6 +30,13 @@ reserved = {
     "title", "plot", "imshow", "imagesc", "wigb", "colorbar",
     "xlim", "ylim", "caxis", "axis", "grid", "subplot", "colormap",
     "_splot", "logspace", "find", "unique", "intersect", "isempty", "sortrows",
+    "global", "cat", "strcmp","strcmpi","class","class_typestring",
+    'uint64', 'uint32', 'uint16', 'uint8', 'int64', 'int32', 'int16', 'int8',
+    'logical', 'single', 'double', 'complex',
+    'xor', 'bitand', 'bitxor',
+    'bitshift',
+    "true", "false",
+    "repmat",
 }
 
 # Common attribute
@@ -92,9 +100,9 @@ def Get_log2(node):
     node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
         node.include("cmath")
-        return "std::log(%(0)s)/std::log(2)"
+        #return "std::log(%(0)s)/std::log(2)"
         #seems like it is a C++11 feature
-        #return "std::log2(", ", ", ")"
+        return "std::log2(", ", ", ")"
     return "arma::log2(", ", ", ")"
 
 def Get_log10(node) :
@@ -240,7 +248,8 @@ def Var_i(node):
 def Get_mod(node):
     node.type = node[0].type
     if node[0].dim == 0 and node[0].mem != 4:
-        return "", " __percent__ ", ""
+        # plenty of parentheses needed here to be safe
+        return "((", ") __percent__ (", "))"
     return "mod(", ", ", ")"
 
 def Get_abs(node):
@@ -383,7 +392,8 @@ def Get_size(node):
 
 def Assign_size(node):
     num = node[-1][0].dim == 3 and "2" or "2"
-    if len(node[-1]) == 2 and (node[-1][1].str == "1" or node[-1][1].str == "2"):
+    if len(node[-1]) == 2 and \
+       (node[-1][1].str == "1" or node[-1][1].str == "2" or node[-1][1].str == "3"):
         return "%(0)s = %(1)s ;"
     else:
         return "uword _%(0)s [] = %(1)s ;\n"+\
@@ -473,8 +483,21 @@ def Assigns_unique(node):
 
 def Get_sortrows(node):
     node.include("m2cpp")
-    args = ", ".join([n.str for n in node])
-    return "m2cpp::sortrows(" + args + ");"
+    return "", ", ", ""
+
+def Assign_sortrows(node):
+    node.include("m2cpp")
+    lhs, rhs = node
+    my_list = []
+    for n in rhs:
+        my_list.append(n.str)
+    my_string = ", ".join(my_list)
+    return "%(0)s = m2cpp::sortrows(" + my_string + ") ;"
+
+def Assigns_sortrows(node):
+    # [B, index] = sortrows(A) ->  m2cpp::sortrows(B, index, A)
+    rhs = ", ".join([n.str for n in node])
+    return "m2cpp::sortrows(" + rhs + ") ;"
 
 def Get_intersect(node):
     node.include("m2cpp")
@@ -689,72 +712,24 @@ def Get_flipud(node):
     return "arma::flipud(%(0)s)"
 
 
-def Get_ones(node):
+def _bulkfill(node, armaFn):
+
+    numDimArgs = node_utils.parseNumDimsAndExplicitMem(node)[0]
 
     # one argument
-    if len(node) == 1:
+    if numDimArgs == 1:
         #size as argument: zeros(size(A))
         if node[0].backend == "reserved" and node[0].name == "size":
             #Take the type of the LHS, normally it is the other way around
             if node.parent.cls == "Assign" and node.parent[0] != node:
-                out = "arma::ones<" + node.parent[0].type + ">("
+                out = armaFn+"<" + node.parent[0].type + ">("
                 return out, ", ", ")"
-            #return "arma::ones<%(type)s>(", ", ", ")"
 
         #arg input is a scalar
         if node[0].num and node[0].dim == 0:
             #dim is matrix
             if node.dim == 3:
-                return "arma::ones<%(type)s>(%(0)s, %(0)s)"
-
-        # arg input is vector
-        if node[0].num and node[0].dim in (1,2):
-
-            # non-trivial variables moved out to own line
-            if node[0].cls != "Var":
-                node[0].auxiliary()
-
-            # indexing arg as input
-            if node.dim in (1,2):
-                return "arma::ones<%(type)s>(%(0)s(0))"
-            if node.dim == 3:
-                return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1))"
-            if node.dim == 4:
-                return "arma::ones<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
-
-    # two args where one vector and other "1" handled specially
-    elif len(node) == 2:
-
-        if node.dim == 3:
-            return "arma::ones<%(type)s>(%(0)s, %(1)s)"
-
-        if node.dim in (1,2):
-            if node[0].cls == "Int" and node[0].value == "1":
-                return "arma::ones<%(type)s>(%(1)s)"
-            if node[1].cls == "Int" and node[1].value == "1":
-                return "arma::ones<%(type)s>(%(0)s)"
-
-    return "arma::ones<%(type)s>(", ", ", ")"
-
-
-def Get_zeros(node):
-
-    # one argument
-    if len(node) == 1:
-
-        #size as argument: zeros(size(A))
-        if node[0].backend == "reserved" and node[0].name == "size":
-            #Take the type of the LHS, normally it is the other way around
-            if node.parent.cls == "Assign" and node.parent[0] != node:
-                out = "arma::zeros<" + node.parent[0].type + ">("
-                return out, ", ", ")"
-            #return "arma::zeros<%(type)s>(", ", ", ")"
-
-        #arg input is a scalar
-        if node[0].num and node[0].dim == 0:
-            #dim is matrix
-            if node.dim == 3:
-                return "arma::zeros<%(type)s>(%(0)s, %(0)s)"
+                return armaFn+"<%(type)s>(%(0)s, %(0)s)"
 
         # arg input is vector
         if node[0].num and node[0].dim in (1,2):
@@ -765,29 +740,38 @@ def Get_zeros(node):
 
             # indexing arg as input if vector
             if node.dim in (1,2):
-                return "arma::zeros<%(type)s>(%(0)s(0))"
+                return armaFn+"<%(type)s>(%(0)s(0))"
             if node.dim == 3:
-                return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1))"
+                return armaFn+"<%(type)s>(%(0)s(0), %(0)s(1))"
             if node.dim == 4:
-                return "arma::zeros<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
+                return armaFn+"<%(type)s>(%(0)s(0), %(0)s(1), %(0)s(2))"
 
     # double argument creates colvec/rowvec/matrix depending on context
-    elif len(node) == 2:
+    elif numDimArgs == 2:
 
         if node.dim == 3:
-            return "arma::zeros<%(type)s>(%(0)s, %(1)s)"
+            return armaFn+"<%(type)s>(%(0)s, %(1)s)"
 
         if node.dim in (1,2):
             # use colvec if first index is '1'
             if node[0].cls == "Int" and node[0].value == "1":
-                return "arma::zeros<%(type)s>(%(1)s)"
+                return armaFn+"<%(type)s>(%(1)s)"
 
             # use rowvec if second index is '1'
             elif node[1].cls == "Int" and node[1].value == "1":
-                return "arma::zeros<%(type)s>(%(0)s)"
+                return armaFn+"<%(type)s>(%(0)s)"
 
-    return "arma::zeros<%(type)s>(", ", ", ")"
+    else: # cube?
+        pass
 
+    return armaFn+"<%(type)s>(", ", ", ")"
+
+def Get_ones(node):
+    return _bulkfill(node, 'arma::ones')
+
+def Get_zeros(node):
+    return _bulkfill(node, 'arma::zeros')
+    
 def Get_qr(node):
     return "", ", ", ""
 
@@ -1464,6 +1448,118 @@ def Get_logspace(node):
 
 def Get_find(node):
     return "find(", ", ", ") + 1"
+
+
+# --------------------------------------------
+
+def Get_true(node):
+    return _bulkfill(node, 'arma::ones')
+
+def Get_false(node):
+    return _bulkfill(node, 'arma::zeros')
+
+def Get_global(node):
+    return "// global %(0)s"
+
+def Get_class(node):
+    return "_M2CPP_DELETE_ITEM_"
+
+def Get_class_typestring(node):
+    if node.parent.cls == 'Assign':
+        return "%(0)s"
+    elif node.parent.cls == 'Get':
+        # For handlers that use node_utils.parseNumDimsAndExplicitMem()
+        # we pass the string to them. Otherwise we mark the arg for deletion
+        if node.parent.name in ['zeros', 'ones', 'repmat']:
+            return "%(0)s"
+        
+    return "_M2CPP_DELETE_ITEM_"
+
+def Get_cat(node):
+    if node[0].value == '1':
+        return "join_rows(%(1)s, %(2)s)"
+    elif node[0].value == '2':
+        return "join_cols(%(1)s, %(2)s)"
+    elif node[0].value == '3':
+        return "join_slices(%(1)s, %(2)s)"
+    else:
+        return node.code
+
+def Get_strcmp(node):  
+    return "%(0)s == %(1)s"
+
+def Get_strcmpi(node):
+    node.include("strings")
+    
+    txt = "(strcasecmp(%(0)s"
+    if isinstance(node.children[0], matlab2cpp.collection.Var):
+        txt += ".c_str()"
+    txt += ", %(1)s"
+    if isinstance(node.children[1], matlab2cpp.collection.Var):
+        txt += ".c_str()"
+    txt += ") == 0)"  
+    return txt
+
+def Get_uint64(node):
+    return "", "", ""
+
+Get_uint32 = Get_uint64
+Get_uint16 = Get_uint64
+Get_uint8 = Get_uint64
+Get_int64 = Get_uint64
+Get_int32 = Get_uint64
+Get_int16 = Get_uint64
+Get_int8 = Get_uint64          
+Get_logical = Get_uint64
+Get_single = Get_uint64
+Get_double = Get_uint64
+Get_complex = Get_uint64
+
+def Get_bitand(node):
+    if (node[0].dim == 0) and (node[1].dim == 0):
+        return "((%(0)s) & (%(1)s))"
+    else: # assume both are matrices
+        return "mat_binand(%(0)s, %(1)s)"
+    
+def Get_xor(node):
+    if (node[0].dim == 0) and (node[1].dim == 0):
+        return "lxor(%(0)s, %(1)s)"
+    else: # assume both are matrices
+        return "mat_lxor(%(0)s, %(1)s)"
+
+def Get_bitxor(node):
+    if (node[0].dim == 0) and (node[1].dim == 0):
+        return "((%(0)s) ^ (%(1)s))"
+    else: # assume both are matrices
+        return "mat_bitxor(%(0)s, %(1)s)"
+
+def Get_bitshift(node):
+    if (node[0].dim == 0):
+        shiftByConstInt = node_utils.getConstInt(node)    
+        if shiftByConstInt is not None:
+            if shiftByConstInt > 0: # shift left  
+                return "((%(0)s) << " + str(shiftByConstInt) + ")"
+            else:
+                return "((%(0)s) >> " + str(-shiftByConstInt) + ")"
+            
+    return "mat_bitshift(%(0)s, %(1)s)"
+
+def Get_repmat(node):
+    dimIdxStart = 1
+    numDimArgs = node_utils.parseNumDimsAndExplicitMem(node.children[dimIdxStart:])[0]
+    dimArgs = node_utils.renderDimNodeArgs(numDimArgs, dimIdxStart)
+    
+    # scalar
+    if node.parent.cls == 'Assign' and node[0].dim in [None, 0]:
+        # TODO: can simplify this: if a vec, then set_size() just needs one arg
+        return node.parent[0].str+".set_size("+dimArgs+"); "+node.parent[0].str+".fill(%(0)s)"
+    
+    return "repmat(", ", ", ")"
+
+def Assign_repmat(node):
+    if '.set_size' in node[1].str:
+        return "%(1)s ;" # delete the var = bit
+    return "%(0)s = %(1)s ;"
 
 if __name__ == "__main__":
     import doctest

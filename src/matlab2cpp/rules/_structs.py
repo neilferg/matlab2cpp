@@ -1,4 +1,4 @@
-#from assign import Assign
+import assign  #from assign import Assign
 from .variables import *
 import matlab2cpp
 
@@ -10,8 +10,18 @@ def Counter(node):
 #def Fvar(node): #defined in variables.py
 #    return "%(name)s.%(value)s"
     
-def Fget(node):
-    pass
+# NOTE: The default implementation of Fget in variables.py doesn't produce
+# correct code e.g:
+# m:   prmStr.Pilots(:,1:numSym,1:numTx);
+# cpp: prmStr.Pilots(m2cpp::span<uvec>(0, prmStr.n_rows-1)) ;
+#                                               | -> prmStr.Pilots
+# TO BE FIXED?
+
+# NF_DEBUG: Take the default (in variables.py) for now
+#def Fget(node):
+#    # NF_DEBUG: original code was returning None -> BANG!
+#    return "%(name)s.%(value)s(", ", ", ")"
+#    pass
 
 def Fset(node):
     return "%(name)s.%(value)s[", ", ", "-1]"
@@ -23,7 +33,9 @@ def Matrix(node):
                 return "%(0)s"
     return "[", ", ", "]"
 
-"""def Assign(node):
+def Assign(node):
+    return assign.Assign(node) # Default
+
     lhs, rhs = node
     print('here')
     # assign a my_var = [a.val], a is a structs, my_var should be a vec
@@ -48,5 +60,5 @@ def Matrix(node):
 
             return string
 
-    return "%(0)s = %(1)s"""""
+    return "%(0)s = %(1)s"
 

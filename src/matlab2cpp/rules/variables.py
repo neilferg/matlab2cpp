@@ -17,6 +17,8 @@ def Fvar(node):
 def Cvar(node):
     "a{b}"
 
+    return node.code+' /*FIXME*/' # cell code doesn't work, just return mcode
+
     #if node.type == "TYPE":
     #    node.declare.type = "cell"
 
@@ -34,6 +36,8 @@ def Set(node):
 
 def Cset(node):
     "a{b}(c) = d"
+
+    return node.code+' /*FIXME*/' # cell code doesn't work, just return mcode
 
     if node.type == "TYPE":
         node.declare.type = "cell"
@@ -64,6 +68,8 @@ def Get(node):
 
 def Cget(node):
     "a{b}(c)"
+    
+    return node.code+' /*FIXME*/' # cell code doesn't work, just return mcode
 
     if node.type == "TYPE":
         node.declare.type = "cell"

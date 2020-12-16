@@ -54,6 +54,13 @@ Example:
     
     if node.declare.type != "TYPE":
         node.type = node.declare.type
+        
+    # If the variable is being used as an index list (as, say, from find())
+    # then the type should to be 'uvec' which is what .elem() access requires   
+    if (node.type == "TYPE") and (node.parent.cls == 'Assign'):
+        if ((node.group[1].cls == "Get") and (node.group[1].name == 'find')) or \
+            node.name.startswith('idxs'): # convention
+            node.type = "uvec"
 
 
 def Get(node):
@@ -172,6 +179,14 @@ def Vector(node):
 
     # default to common denominator
     node.type = [n.type for n in node]
+    
+    # Refine int or uword
+    if node.type == "int":
+        node.type = "uword"
+        for n in node:
+            if n.cls == "Neg":
+                node.type = "int"
+                break       
 
     # dimensionality in vector
     dims = {n.dim for n in node}

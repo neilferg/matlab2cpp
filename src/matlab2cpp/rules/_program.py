@@ -191,7 +191,7 @@ def Warning(node):
 
 def Struct(node):
 
-    name = "_"+node.name.capitalize()
+    name = node.name
     out = "struct " + name + "\n{"
 
     declares = {}
@@ -209,8 +209,11 @@ def Struct(node):
 
         declares[type].append(child)
 
-    for key, val in declares.items():
-        out = out + "\n" + key + " " + ", ".join([str(v) for v in val]) + " ;"
+    for typ, fields in declares.items():
+        if typ == 'string': typ = 'std::string'
+        
+        for field in fields:
+            out += "\n" + typ + " " + str(field) + " ;"
     out = out + "\n} ;"
 
     # out = add_indenting(out)

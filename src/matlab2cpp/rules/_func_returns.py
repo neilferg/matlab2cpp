@@ -201,7 +201,8 @@ Examples:
     for child in node[:]:
 
         # return values in multi-returns are declared as parameter
-        if child.name in returns:
+        if child.name in returns or \
+            child.name.startswith('g_'): # 'g_' => global var. Don't declare
             continue
 
         type = type_string(child)

@@ -184,6 +184,10 @@ Args:
 
     t = time.time()
     stamp = date.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S')
+    
+    typesHeader = args.types_header
+    if typesHeader and os.path.exists(typesHeader):
+        os.remove(typesHeader)
 
     for program in builder.project:
 
@@ -195,7 +199,7 @@ Args:
         #print(name)
 
         cpp = qfunctions.qcpp(program)
-        hpp = qfunctions.qhpp(program)
+        hpp = qfunctions.qhpp(program, suggest=False, typesHeader=typesHeader)
         py = qfunctions.qpy(program, prefix=True)
         log = qfunctions.qlog(program)
 
@@ -207,6 +211,14 @@ Args:
                 if os.path.isfile(name+ext):
                     os.remove(name+ext)
 
+        if typesHeader:
+            types = qfunctions.qtypes(program)
+            if len(types) > 0:
+                with open(typesHeader, "a") as fs:
+                    fs.write('// '+os.path.basename(program.file)+'\n')
+                    fs.write(types)
+                    fs.write('\n// ----------------------------------------------------\n\n')
+        
         if cpp:
             cpp = """// Automatically translated using m2cpp %s on %s
 
@@ -216,24 +228,24 @@ Args:
             f.close()
 
         if hpp:
-            hpp = """// Automatically translated using m2cpp %s on %s
+            hpp = """// Automatically translated using m2cpp
 
-%s""" % (__version__, stamp, hpp)
+%s""" % (hpp)
             f = open(name+".hpp", "w")
             f.write(hpp)
             f.close()
 
         if log:
-            log = "Automatically translated using m2cpp %s on %s\n\n%s"\
-                    % (__version__, stamp, log)
+            log = "Automatically translated using m2cpp\n\n%s"\
+                    % (log)
             f = open(name+".log", "w")
             f.write(log)
             f.close()
 
         if py:
-            py = """# Automatically translated using m2cpp %s on %s
+            py = """# Automatically translated using m2cpp
 #
-%s""" % (__version__, stamp, py)
+%s""" % (py)
             f = open(name+".py", "w")
             f.write(py)
             f.close()

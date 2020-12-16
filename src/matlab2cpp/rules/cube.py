@@ -1,5 +1,6 @@
 from .variables import *
 from . import armadillo as arma
+from .. import node_utils
 
 def Get(node):
 
@@ -62,6 +63,8 @@ def Get(node):
         arg0, dim0 = arma.configure_arg(node[0], 0)
         arg1, dim1 = arma.configure_arg(node[1], 1)
         arg2, dim2 = arma.configure_arg(node[2], 2)
+        
+        arg0, arg1, arg2 = node_utils.spanForAll([arg0, arg1, arg2], node)
 
         # unknown arguments
         if -1 in (dim0, dim1, dim2):
@@ -154,6 +157,8 @@ def Set(node):
         arg0, dim0 = arma.configure_arg(node[0], 0)
         arg1, dim1 = arma.configure_arg(node[1], 1)
         arg2, dim2 = arma.configure_arg(node[2], 2)
+        
+        arg0, arg1, arg2 = node_utils.spanForAll([arg0, arg1, arg2], node)
 
         # unkown input
         if -1 in (dim0, dim1, dim2):

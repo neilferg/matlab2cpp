@@ -1,5 +1,6 @@
 import matlab2cpp
 from .assign import Assign
+from .. import node_utils
 
 def Paren(node):
     """Parenthesis surounding expression.
@@ -733,30 +734,20 @@ Examples:
         node.include("m2cpp")
         
         # <start>:<stop>
-        if len(node) == 2:
+        if len(node) in [2, 3]:
+            if len(node) == 2:   # <start>:<stop>
+                args = "(%(0)s, 1, %(1)s)"
+            elif len(node) == 3: # <start>:<step>:<stop>
+                args = "(%(0)s, %(1)s, %(2)s)"
+            else:
+                return None # error
+            
             if node.group.cls == "Assign":
-                node.type = 'rowvec'
-                return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
-            return "m2cpp::fspan" + "(%(0)s, 1, %(1)s)"
-
-        # <start>:<step>:<stop>
-        elif len(node) == 3:
-            node.type = 'rowvec'
-            args = "(%(0)s, %(1)s, %(2)s)"
-            #return "m2cpp::span<" + node.type + ">" + args
-            #return "arma::strans(arma::linspace(%(0)s, %(2)s, (%(2)s%(1)s))"
-            return "m2cpp::fspan" + args
-
-        #Sets template type to LHS:
-        # ex, ti is type vec: ti = (m2cpp::span<vec>(0, 1, nt-1))*dt ;
-        #should probably change the if statement above, context: assignment
-        #if node.group.cls == "Assign":
-            #print(node.group)
-            #print(node.group.cls)
-            #print(node.group[0].type)
-            #print("\n\n\n")
-        #    return "m2cpp::span<" + node.group[0].type + ">" +args
-        return "m2cpp::span<" + node.type + ">(", ", ", ")"
+                return "arma::regspace<" + node.group[0].type + ">" + args
+            
+            node.type = node_utils.deduceTemplateType(node)
+            
+            return "arma::regspace<" + node.type + ">" +args
 
 
 if __name__ == "__main__":

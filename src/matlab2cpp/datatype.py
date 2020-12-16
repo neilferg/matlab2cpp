@@ -140,6 +140,7 @@ def get_dim(val):
     elif val in dim3:   dim = 3
     elif val in dim4:   dim = 4
     elif val in others: dim = None
+    elif val.startswith('struct__'): dim = None
     else:
         raise ValueError("Datatype '%s' not recognized" % val)
     return dim
@@ -156,6 +157,7 @@ def get_mem(val):
     elif val in mem3:  mem = 3
     elif val in mem4:  mem = 4
     elif val in others: mem = None
+    elif val.startswith('struct__'): mem = None
     else:
         raise ValueError("Datatype '%s' not recognized" % val)
 
@@ -352,6 +354,28 @@ class Suggest(object):
         instance.declare.prop["suggest"] = value
     def __get__(self, instance, owner):
         return supplement.suggests.get(instance)
+
+
+# -----------------------------------------
+
+matlabTypes_mem = {
+    'uint64':  0, # uword
+    'uint32':  0,
+    'uint16':  0,
+    'uint8':   0,
+    'int64':   1, # int
+    'int32':   1,
+    'int16':   1,
+    'int8':    1,
+    'logical': 0, # uword
+    'single':  2, # float
+    'double':  3, # double
+    'complex': 4, # complex
+    
+    # Armadillo types
+    'uword':   0,
+    'int':     1,
+}
 
 if __name__ == "__main__":
     import doctest

@@ -110,5 +110,9 @@ def create_parser():
         "-n", '--nargin', action="store_true", help=(
             "Don't remove if and switch branches which use nargin variable."),
     )
+    parser.add_argument(
+    "-H", "--types-header", type=str, dest="types_header", help=(
+        "Write all struct defintions to a common types header file"),
+    )
 
     return parser

@@ -28,7 +28,15 @@ def Vector(node):
 
     #max mem in list and type list
     try:
-        mem = max([int(n.mem) if n.num else -1 for n in node])
+        mems = []
+        for n in node:
+            m = n.mem
+            if (m is None): # struct field returns mem = None
+                raise Exception("BAAD") 
+            if n.cls == 'Int' and int(n.value) >= 0:
+                m = 0
+            mems.append(m)
+        mem = max(mems)
     except:
         mem = -1
     mem_type = ["uword", "sword", "float", "double", "cx_double"]
@@ -79,6 +87,8 @@ def Matrix(node):
         return "{", ", ", "}"
 
     dims = {n.dim for n in node}
+    
+    nodes = None # to trap unassigned nodes
 
     # single vector with no content
     if len(node) == 1 and len(node[0]) == 0:
@@ -88,8 +98,12 @@ def Matrix(node):
     elif all([n.value for n in node]):
 
         # Inline matrices are moved to own lines
-        if node.parent.cls not in ("Assign", "Statement") and \
-                    node.parent.backend != "reserved":
+        do = node.parent.cls not in ("Assign", "Statement")
+        if node.parent.backend == "reserved":
+            # NF_DEBUG: what reserved commands is un-inlining not applicable to?
+            pass #do = do and node.parent.name in [ "transpose" ]
+        
+        if do:
             if node.parent.cls in ("Get", "Set") and node.mem != 0:
                 if node.parent.type == "TYPE":
                     node.type = (node.dim, 3)
@@ -139,6 +153,11 @@ def Matrix(node):
                 nodes.append(str(node[idx].auxiliary()))
             else:
                 nodes.append(str(node[idx]))
+             
+    if nodes is None:
+        print('BAAD: Matrix in ', node.func.name, node.code)
+        out = node.code+ ' /*FIXME Matrix*/'
+        return out
 
     out = str(nodes[0])
     for node_ in nodes[1:]:
@@ -185,15 +204,15 @@ def Assign(node):
             # save number of rows as 'rows'
             node["rows"] = len(node[1][0])*len(node[1])
 
-            if node.prop["ctype"] == "mat":
-                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-                "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, 1, false) ;"
-            else:
-                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-                "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, false) ;"
+            #if node.prop["ctype"] == "mat":
+            #    return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+            #    "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, 1, false) ;"
+            #else:
+            #    return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+            #    "%(0)s = %(ctype)s(_" + node[0].name + ", %(rows)s, false) ;"
 
             # use uniform initialization
-            #return "%(0)s = %(1)s ;"
+            return "%(0)s = %(1)s ;"
 
         # rowvec
         elif rhs.dim == 2:
@@ -201,28 +220,28 @@ def Assign(node):
             # save number of cols as 'cols'
             node["cols"] = len(node[1][0])*len(node[1])
 
-            if node.prop["ctype"] == "mat":
-                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-                "%(0)s = %(ctype)s(_" + node[0].name + ", 1, %(cols)s, false) ;"
-            else:
-                return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-                "%(0)s = %(ctype)s(_" + node[0].name + ", %(cols)s, false) ;"
+            #if node.prop["ctype"] == "mat":
+            #    return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+            #    "%(0)s = %(ctype)s(_" + node[0].name + ", 1, %(cols)s, false) ;"
+            #else:
+            #    return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+            #    "%(0)s = %(ctype)s(_" + node[0].name + ", %(cols)s, false) ;"
 
             # use uniform initialization
-            #return "%(0)s = %(1)s ;"
+            return "%(0)s = %(1)s ;"
 
         # matrix
         elif rhs.dim == 3:
             # save number of rows and columns
             node["rows"] = len(node[1][0])
             node["cols"] = len(node[1])
-            return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
-            "%(0)s = arma::strans(%(ctype)s(_" + node[0].name + ", %(rows)s, %(cols)s, false)) ;"
+            #return type + " _" + node[0].name + " [] = %(1)s ;\n"+\
+            #"%(0)s = arma::strans(%(ctype)s(_" + node[0].name + ", %(rows)s, %(cols)s, false)) ;"
 
             # use uniform initialization
-            #my_list = node[1].children
-            #my_list = ["{" + str(elem) + "}" for elem in my_list]
-            #return "%(0)s = {" + ", ".join(my_list) + "} ;"
+            my_list = node[1].children
+            my_list = ["{" + str(elem) + "}" for elem in my_list]
+            return "%(0)s = {" + ", ".join(my_list) + "} ;"
 
         assert False
 

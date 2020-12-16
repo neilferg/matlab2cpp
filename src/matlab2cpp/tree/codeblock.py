@@ -167,6 +167,10 @@ Example:
             self.code[cur+4] not in c.letters+c.digits+"_":
             cur = self.create_reserved(block, cur)
 
+        elif self.code[cur:cur+6] == "global" and \
+            self.code[cur+6] not in c.letters+c.digits+"_":
+            cur = self.create_reserved(block, cur)
+
         elif self.code[cur] in c.e_start:
             j = findend.expression(self, cur)
 

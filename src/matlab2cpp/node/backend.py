@@ -113,7 +113,10 @@ See also:
         if node.type == "TYPE":
             type = node.declare.prop.get("suggest", "TYPE")
             if type != "TYPE":
-                type = "(" + type + ")"
+                # Can get garbage suggestions too. Have seen things like
+                # '(0,3)' - a tuple. str() the result and allow user to
+                # do the filtering
+                type = "(" + str(type) + ")"
         else:
             type = node.type
         out += type.ljust(8)
@@ -330,7 +333,7 @@ Returns:
         assert structs.cls == "Structs"
 
         if node not in structs:
-            struct = matlab2cpp.collection.Struct(structs, name=node.name)
+            struct = matlab2cpp.collection.Struct(structs, name=node.structNsName())
         else:
             struct = structs[node]
 
@@ -350,7 +353,7 @@ Returns:
         else:
             if node.name not in declares.names:
                 var = matlab2cpp.collection.Var(declares, name=node.name, value=value)
-                var.type="struct"
+                var.type=node.structNsName()
 
         return matlab2cpp.collection.Var(struct, name=value)
         parent = struct
@@ -529,6 +532,8 @@ See also:
         backend = node.backend
         if backend == "TYPE":
             backend = "unknown"
+        elif backend.startswith('struct__'):
+            backend = 'struct'
 
         assert "_"+backend in matlab2cpp.rules.__dict__, (
             "No rule {}; ensure your .py file is properly set up.".format(backend))
@@ -647,7 +652,7 @@ See also:
 
         #name = os.path.relpath(name, os.path.dirname(node.program.name))
         name = os.path.basename(name)
-        include_code = '#include "%s.hpp"' % name
+        include_code = '#include <%s.hpp>' % name
         library_code = ""
 
         if node.name == name:
@@ -713,6 +718,8 @@ See also:
             include_code = "#include <tbb/tbb.h>"
         elif name == "no_min_max":
             include_code = "#define NOMINMAX"
+        elif name == "strings":
+            include_code = "#include <strings.h>"
         else:
             include_code = ""
 

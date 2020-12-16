@@ -189,8 +189,7 @@ Example:
 
     k = end+1
 
-    while self.code[k] in " \t\n;,":
-        k += 1
+    k = matlab2cpp.node_utils.skipStuff(self, k, " \t\n;,", skipComment=True)
 
     while self.code[k:k+4] == "case" and self.code[k+4] in " \t(":
 
