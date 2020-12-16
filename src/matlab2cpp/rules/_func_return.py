@@ -117,14 +117,15 @@ def Declares(node):
     if not node:
         return ""
 
-    returns = node.parent[1]
+    params = node.parent[2]
 
     declares = {}   # {"int" : ["a", "b"]} -> int a, b ;
     structs = {}    # {"_A" : "a"} -> _A a;
 
     # fill declares and structs
     for child in node[:]:
-        if child.name.startswith('g_'): # 'g_' => global var. Don't declare
+        if child.name in params or \
+        child.name.startswith('g_'): # 'g_' => global var. Don't declare
             continue
 
         type = type_string(child)

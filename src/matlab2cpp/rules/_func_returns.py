@@ -193,6 +193,7 @@ Examples:
         return ""
 
     returns = node.parent[1]
+    params = node.parent[2]
 
     declares = {}   # {"int" : ["a", "b"]} -> int a, b ;
     structs = {}    # {"_A" : "a"} -> _A a;
@@ -202,6 +203,7 @@ Examples:
 
         # return values in multi-returns are declared as parameter
         if child.name in returns or \
+           child.name in params or \
             child.name.startswith('g_'): # 'g_' => global var. Don't declare
             continue
 
