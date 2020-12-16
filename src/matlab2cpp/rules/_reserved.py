@@ -1542,6 +1542,8 @@ def Get_bitshift(node):
             else:
                 return "((%(0)s) >> " + str(-shiftByConstInt) + ")"
             
+        return "bitshift(%(0)s, %(1)s)"
+            
     return "mat_bitshift(%(0)s, %(1)s)"
 
 def Get_repmat(node):
