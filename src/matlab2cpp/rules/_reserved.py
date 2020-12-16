@@ -1519,9 +1519,11 @@ def Get_bitand(node):
     if (node[0].dim == 0) and (node[1].dim == 0):
         return "((%(0)s) & (%(1)s))"
     else: # assume both are matrices
+        node.include("arma_extras")
         return "mat_binand(%(0)s, %(1)s)"
     
 def Get_xor(node):
+    node.include("arma_extras")
     if (node[0].dim == 0) and (node[1].dim == 0):
         return "lxor(%(0)s, %(1)s)"
     else: # assume both are matrices
@@ -1531,6 +1533,7 @@ def Get_bitxor(node):
     if (node[0].dim == 0) and (node[1].dim == 0):
         return "((%(0)s) ^ (%(1)s))"
     else: # assume both are matrices
+        node.include("arma_extras")
         return "mat_bitxor(%(0)s, %(1)s)"
 
 def Get_bitshift(node):
@@ -1542,8 +1545,10 @@ def Get_bitshift(node):
             else:
                 return "((%(0)s) >> " + str(-shiftByConstInt) + ")"
             
+        node.include("arma_extras")
         return "bitshift(%(0)s, %(1)s)"
             
+    node.include("arma_extras")
     return "mat_bitshift(%(0)s, %(1)s)"
 
 def Get_repmat(node):

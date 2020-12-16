@@ -720,6 +720,8 @@ See also:
             include_code = "#define NOMINMAX"
         elif name == "strings":
             include_code = "#include <strings.h>"
+        elif name == "arma_extras":
+            include_code = "#include <arma_extras.hpp>"
         else:
             include_code = ""
 
