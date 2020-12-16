@@ -194,7 +194,7 @@ See also:
     return out
 
 
-def qtypes(code):
+def qtypes(code, suggest=False):
     from . import tree
 
     if isinstance(code, str):
@@ -314,9 +314,7 @@ See also:
     if includes.str:
         out += includes.str + "\n\n"
 
-    if typesHeader is not None:
-        out += "#include <"+typesHeader+">\n\n"
-    else:
+    if typesHeader is None:
         if structs.str:
             out += structs.str + "\n\n"
 

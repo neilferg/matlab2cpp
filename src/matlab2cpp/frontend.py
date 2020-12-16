@@ -212,7 +212,7 @@ Args:
                     os.remove(name+ext)
 
         if typesHeader:
-            types = qfunctions.qtypes(program)
+            types = qfunctions.qtypes(program, suggest=False)
             if len(types) > 0:
                 with open(typesHeader, "a") as fs:
                     fs.write('// '+os.path.basename(program.file)+'\n')
