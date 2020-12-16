@@ -195,8 +195,9 @@ Examples:
     returns = node.parent[1]
     params = node.parent[2]
 
-    declares = {}   # {"int" : ["a", "b"]} -> int a, b ;
-    structs = {}    # {"_A" : "a"} -> _A a;
+    structs = {}
+    declares = []
+    declares_aux = []
 
     # fill declares and structs
     for child in node[:]:
@@ -206,43 +207,31 @@ Examples:
            child.name in params or \
             child.name.startswith('g_'): # 'g_' => global var. Don't declare
             continue
-
-        type = type_string(child)
-
-        if type not in declares:
-            declares[type] = []
-
-        declares[type].append(child)
+        
+        if child.name.startswith('_aux'):
+            declares_aux.append(child)
+        else:
+            declares.append(child)
 
         if child.type == "structs":
             structs[child.name] = child
 
     # create output
-    out = ""
-    keys = sorted(declares.keys())
-    for key in keys:
+    out = ""            
+    declares.sort(key=lambda x: x.name)
+    declares_aux.sort(key=lambda x: x.name)
+    declares.extend(declares_aux) # put autogenned vars at end
 
-        val = sorted(declares[key], key=lambda x: x.name)
-
-
-        # datatype
-        out += "\n" + key + " "
-
-        # all variables with that type
-        for v in val:
-
-            out += str(v)
-            if v.name in structs:
-
-                structs_ = node.program[3]
-                struct = structs_[structs_.names.index(v.name)]
-                size = struct[struct.names.index("_size")].value
-                out += "[%s]" % size
-
-            out += ", "
-
-        out = out[:-2] + " ;"
-
+    for v in declares:
+        out += "\n" + type_string(v) + ' ' + v.name
+        if v.name in structs:
+            structs_ = node.program[3]
+            struct = structs_[structs_.names.index(v.name)]
+            size = struct[struct.names.index("_size")].value
+            out += "[%s]" % size
+            
+        out += " ;"
+        
     return out[1:]
 
 
