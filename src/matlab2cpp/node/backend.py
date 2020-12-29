@@ -163,7 +163,7 @@ See also:
     if node.cls == "Matrix":
         matrix_mode = True
 
-    if matrix_mode and type == "int" and node.group.cls in ("Get", "Set"):
+    if matrix_mode and type == "sword" and node.group.cls in ("Get", "Set"):
         type = "uword"
 
     line = node

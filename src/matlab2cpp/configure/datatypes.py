@@ -181,11 +181,11 @@ def Vector(node):
     node.type = [n.type for n in node]
     
     # Refine int or uword
-    if node.type == "int":
+    if node.type == "sword":
         node.type = "uword"
         for n in node:
             if n.cls == "Neg":
-                node.type = "int"
+                node.type = "sword"
                 break       
 
     # dimensionality in vector
@@ -294,7 +294,7 @@ def Transpose(node):
 Ctranspose = Transpose
 
 def For(node):
-    node[0].suggest = "int"
+    node[0].suggest = "sword"
     #node[0].suggest = "uword"
     #index = node.parent.children.index(node)
     #tbb = node.parent.children[index - 1].cls
@@ -338,8 +338,8 @@ def Exp(node):
 def Elexp(node):
     node.type = [n.type for n in node]
 
-End = "int"
-Int = "int"
+End = "sword"
+Int = "sword"
 Float = "double"
 String = "string"
 Imag = "cx_double"

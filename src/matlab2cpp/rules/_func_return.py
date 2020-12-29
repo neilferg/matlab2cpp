@@ -71,8 +71,8 @@ def Params(node):
         >>> from matlab2cpp.tree import Builder
         >>> builder = Builder()
         >>> builder.load("unamed", code)
-        >>> builder[0].ftypes = {"f":{"a": "int", "b":"double", "c":"cx_mat",
-        ...     "d":"func_lambda", "e":"struct", "y":"int"}}
+        >>> builder[0].ftypes = {"f":{"a": "sword", "b":"double", "c":"cx_mat",
+        ...     "d":"func_lambda", "e":"struct", "y":"sword"}}
         >>> print(matlab2cpp.qscript(builder))
         int f(int a, double b, cx_mat c, std::function d, _E e)
         {

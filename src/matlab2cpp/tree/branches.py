@@ -335,7 +335,7 @@ def parforloop(self, parent, cur):
 
     else:
         parfor_loop[0].create_declare()
-        parfor_loop[0].suggest = "int"
+        parfor_loop[0].suggest = "sword"
 
     cur += 1
     while self.code[cur] in " \t":
@@ -433,7 +433,7 @@ Example:
 
     else:
         for_loop[0].create_declare()
-        for_loop[0].suggest = "int"
+        for_loop[0].suggest = "sword"
 
 
     cur += 1

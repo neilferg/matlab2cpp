@@ -151,7 +151,7 @@ def Get_round(node):
     else:
         decimals = "0"
 
-    # int and uword do not have decimals
+    # sword and uword do not have decimals
     if node[0].mem < 2:
         return "%(0)s"
 

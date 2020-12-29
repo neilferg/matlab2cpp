@@ -82,7 +82,7 @@ def tbb(node, start, stop, step):
 
     any_vec_or_mat = False
     for var, type in zip(assigned_var, type_info):
-        if type not in ["uword", "int", "float", "double"]:
+        if type not in ["uword", "sword", "float", "double"]:
             any_vec_or_mat = True
 
     #tbb.counter += 1
@@ -93,7 +93,7 @@ def tbb(node, start, stop, step):
         declare_struct = "struct tbb_var_struct" + "\n{"
 
         for var, type in zip(assigned_var, type_info):
-            if type not in ["uword", "int", "float", "double"]:
+            if type not in ["uword", "sword", "float", "double"]:
                 declare_struct += "\n" + type + " " + var + ";"
 
         declare_struct += "\n} " + ";\n"
@@ -109,14 +109,14 @@ def tbb(node, start, stop, step):
 
     #assign to local L, x, y
     for var, type in zip(assigned_var, type_info):
-        if type in ["uword", "int", "float", "double"]:
+        if type in ["uword", "sword", "float", "double"]:
             out += type + " " + var + ";\n"
 
     if any_vec_or_mat:
         out += "struct tbb_var_struct" + " tbb_struct_vars = tbb_per_thread_data" + ".local() ;\n"
 
         for var, type in zip(assigned_var, type_info):
-            if type not in ["uword", "int", "float", "double"]:
+            if type not in ["uword", "sword", "float", "double"]:
                 out += type + "& " + var + " = " + "tbb_struct_vars." + var + ";\n"
 
     #for var, type in zip(assigned_var, type_info):

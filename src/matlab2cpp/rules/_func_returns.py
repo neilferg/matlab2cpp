@@ -144,7 +144,7 @@ Adds type prefix.
 Contains: Var*
 
 Examples:
-    >>> ftypes = {"f": {"a":"int", "b":"double"}}
+    >>> ftypes = {"f": {"a":"sword", "b":"double"}}
     >>> print(matlab2cpp.qscript("function f(a,b)", ftypes=ftypes))
     void f(int a, double b)
     {

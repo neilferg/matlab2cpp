@@ -221,7 +221,7 @@ def datatype_string(cols):
             #scalar
             if M == 1 and N == 1:
                 if integer:
-                    data_type = "int"
+                    data_type = "sword"
                 else:
                     data_type = "double"
                     

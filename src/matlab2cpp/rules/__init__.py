@@ -39,8 +39,6 @@ Datatype driven rules have the same name as datatypes reference in
 +-----------+----------------------------------------+------------------+
 | imat      | :py:mod:`~matlab2cpp.rules._imat`      | Armadillo matrix |
 +-----------+----------------------------------------+------------------+
-| int       | :py:mod:`~matlab2cpp.rules._int`       | Scalar integer   |
-+-----------+----------------------------------------+------------------+
 | irowvec   | :py:mod:`~matlab2cpp.rules._irowvec`   | Armadillo rowvec |
 +-----------+----------------------------------------+------------------+
 | ivec      | :py:mod:`~matlab2cpp.rules._ivec`      | Armadillo colvec |
@@ -54,6 +52,8 @@ Datatype driven rules have the same name as datatypes reference in
 | struct    | :py:mod:`~matlab2cpp.rules._struct`    | Struct           |
 +-----------+----------------------------------------+------------------+
 | structs   | :py:mod:`~matlab2cpp.rules._structs`   | Array of structs |
++-----------+----------------------------------------+------------------+
+| sword     | :py:mod:`~matlab2cpp.rules._sword`     | Scalar integer   |
 +-----------+----------------------------------------+------------------+
 | ucube     | :py:mod:`~matlab2cpp.rules._ucube`     | Armadillo cube   |
 +-----------+----------------------------------------+------------------+

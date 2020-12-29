@@ -50,8 +50,8 @@ def Assign(node):
             declares = node.func[0]
             if "_i" not in declares:
                 declare = matlab2cpp.collection.Var(declares, "_i")
-                declare.type = "int"
-                declare.backend = "int"
+                declare.type = "sword"
+                declare.backend = "sword"
                 declares.translate()
             
             string = var + ".resize(" + size + ") ;\n" +\

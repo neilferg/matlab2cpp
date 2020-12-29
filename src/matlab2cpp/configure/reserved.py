@@ -1,7 +1,7 @@
 from  .. import node_utils
 
-Var_false = "int"
-Var_true = "int"
+Var_false = "sword"
+Var_true = "sword"
 Var_pi = "double"
 Get_linspace = "rowvec"
 
@@ -31,7 +31,7 @@ def Get_fix(node):
 
 def Get_round(node):
     if len(node) == 1:
-        #int, float, double, uword
+        #sword, float, double, uword
         if node[0].dim == 0 and node[0].mem != 4:
             node.type = "double"
         #arma types
@@ -125,7 +125,7 @@ def Get_any(node):
 
 Get_all = Get_any
 
-Get_isequal = "int"
+Get_isequal = "sword"
 
 def Get_size(node):
 
@@ -211,15 +211,15 @@ def Assigns_size(node):
 
     # suggest some types for matrix
     if len(node)==3:
-        node[0].suggest = "int"
-        node[1].suggest = "int"
+        node[0].suggest = "sword"
+        node[1].suggest = "sword"
 
     # suggest some types for cube
     if len(node)==4:
 
-        node[0].suggest = "int"
-        node[1].suggest = "int"
-        node[2].suggest = "int"
+        node[0].suggest = "sword"
+        node[1].suggest = "sword"
+        node[2].suggest = "sword"
 
 def Get_length(node):
     node.type = "uword"
@@ -266,7 +266,7 @@ def Assigns_min(node):
         pass
     else:
         node[0].suggest = (0, var.mem)
-        node[1].suggest = "int"
+        node[1].suggest = "sword"
 
 Get_max = Get_min
 
@@ -281,7 +281,7 @@ def Assigns_max(node):
         pass
     else:
         node[0].suggest = (0, var.mem)
-        node[1].suggest = "int"
+        node[1].suggest = "sword"
 
 def Get_fliplr(node):
     if len(node) > 0:
@@ -453,7 +453,7 @@ def Get_reshape(node):
         node.type = (3, node[0].mem)
 
 def Get_nextpow2(node):
-    node.type = "int"
+    node.type = "sword"
     
 def Get_fft(node):
 
@@ -599,7 +599,7 @@ Get_logical = Get_uint64
         
 def Get_int64(node):
     if node[0].dim is not None:
-        node.type = "int"
+        node.type = "sword"
         node.dim = node[0].dim
         
 Get_int32 = Get_int64

@@ -7,7 +7,7 @@ PREFIX = """# encoding: utf-8
 #
 # Valid inputs:
 #
-# uword   int     float   double cx_double
+# uword   sword   float   double cx_double
 # uvec    ivec    fvec    vec    cx_vec
 # urowvec irowvec frowvec rowvec cx_rowvec
 # umat    imat    fmat    mat    cx_mat
@@ -41,14 +41,14 @@ Returns: str
     String representation of suppliment file
 
 Example:
-    >>> types_f = {"f" : {"a":"int"}, "g" : {"b":""}}
+    >>> types_f = {"f" : {"a":"sword"}, "g" : {"b":""}}
     >>> types_s = {"c" : {"d":""}}
     >>> types_i = ["#include <armadillo>"]
     >>> suggest = {"g" : {"b":"float"}, "c" : {"d":"vec"}}
     >>> print(str_variables(types_f, types_s, types_i, suggest, prefix=False))
     functions = {
       "f" : {
-        "a" : "int",
+        "a" : "sword",
       },
       "g" : {
         "b" : "", # float

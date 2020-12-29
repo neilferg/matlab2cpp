@@ -80,7 +80,7 @@ def Matrix(node):
 
 Vector = "matrix"
 Cell = "cell"
-Int = "int"
+Int = "sword"
 Float = "double"
 Imag = "cx_double"
 String = "string"

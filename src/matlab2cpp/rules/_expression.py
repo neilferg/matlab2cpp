@@ -393,7 +393,7 @@ def Matrixdivision(node):
             elif child.mem < 2 and mem < 2:
                 out = out + "*1.0/" + str(child)
 
-            elif child.type == "int" and mem == 4:
+            elif child.type == "sword" and mem == 4:
                 out = out + "/" + "double(" + str(child) + ")"
 
             else:

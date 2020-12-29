@@ -18,7 +18,7 @@ The follwing constructor classes exists here:
 from . import supplement
 
 
-dim0 = {"int", "float", "uword", "double", "cx_double", "size_t"}
+dim0 = {"sword", "float", "uword", "double", "cx_double", "size_t"}
 dim1 = {"ivec", "fvec", "uvec", "vec", "cx_vec"}
 dim2 = {"irowvec", "frowvec", "urowvec", "rowvec", "cx_rowvec"}
 dim3 = {"imat", "fmat", "umat", "mat", "cx_mat"}
@@ -27,7 +27,7 @@ dim4 = {"icube", "fcube", "ucube", "cube", "cx_cube"}
 dims = [dim0, dim1, dim2, dim3, dim4]
 
 mem0 = {"uword", "uvec", "urowvec", "umat", "ucube"}
-mem1 = {"int", "ivec", "irowvec", "imat", "icube"}
+mem1 = {"sword", "ivec", "irowvec", "imat", "icube"}
 mem2 = {"float", "fvec", "frowvec", "fmat", "fcube"}
 mem3 = {"double", "vec", "rowvec", "mat", "cube"}
 mem4 = {"cx_double", "cx_vec", "cx_rowvec", "cx_mat", "cx_cube"}
@@ -294,7 +294,7 @@ Datatypes can be roughly split into two groups: **numerical** and
 +-------------+--------------+-----------+-----------+----------+-------------+
 |             | unsigned int | int       | float     | double   | complex     |
 +=============+==============+===========+===========+==========+=============+
-| scalar      | *uword*      | *int*     | *float*   | *double* | *cx_double* |
+| scalar      | *uword*      | *sword    | *float*   | *double* | *cx_double* |
 +-------------+--------------+-----------+-----------+----------+-------------+
 | vector      | *uvec*       | *ivec*    | *fvec*    | *vec*    | *cx_vec*    |
 +-------------+--------------+-----------+-----------+----------+-------------+
@@ -363,7 +363,7 @@ matlabTypes_mem = {
     'uint32':  0,
     'uint16':  0,
     'uint8':   0,
-    'int64':   1, # int
+    'int64':   1, # sword
     'int32':   1,
     'int16':   1,
     'int8':    1,
@@ -374,7 +374,7 @@ matlabTypes_mem = {
     
     # Armadillo types
     'uword':   0,
-    'int':     1,
+    'sword':   1,
 }
 
 if __name__ == "__main__":

@@ -369,7 +369,7 @@ Example::
     >>> print(matlab2cpp.qpy(code, suggest=True))
     functions = {
       "main" : {
-        "a" : "int",
+        "a" : "sword",
         "b" : "double",
         "c" : "string",
       },

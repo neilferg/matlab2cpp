@@ -247,7 +247,7 @@ def add_parameters(project):
             if func:
                 return_params = func[1]
                 # dictionary which is used as a counter
-                type_counter = {"int" : 0, "float" : 0, "double" : 0, "uword" : 0, "cx_double" : 0,
+                type_counter = {"sword" : 0, "float" : 0, "double" : 0, "uword" : 0, "cx_double" : 0,
                 "ivec" : 0, "fvec" : 0, "uvec" : 0, "vec" : 0, "cx_vec" : 0,
                 "irowvec" : 0, "frowvec" : 0, "urowvec" : 0, "rowvec" : 0, "cx_rowvec" : 0,
                 "imat" : 0, "fmat" : 0, "umat" : 0, "mat" : 0, "cx_mat" : 0,

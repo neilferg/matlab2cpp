@@ -191,7 +191,7 @@ def Assign(node):
     if rhs.value:
 
         type = node.type
-        if type == "int":
+        if type == "sword":
             type = "sword"
 
         # scalar

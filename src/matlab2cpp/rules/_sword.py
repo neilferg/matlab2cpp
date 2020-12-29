@@ -1,5 +1,5 @@
 from .assign import Assign
 from .variables import *
 
-# Declare = "int %(name)s ;"
+# Declare = "sword %(name)s ;"
 Int = "%(value)s"
