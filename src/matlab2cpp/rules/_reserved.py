@@ -468,8 +468,11 @@ def Assigns_chol(node):
 
 
 def Get_unique(node):
-    node.include("m2cpp")
-    return "", ", ", ""
+    if node.parent.cls == "Get":
+        args = ", ".join([n.str for n in node])
+        return "unique(" + args + ")"
+    else:
+        return "", ", ", ""     
 
 def Assign_unique(node):
     node.include("m2cpp")
